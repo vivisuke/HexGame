@@ -5,8 +5,8 @@
 0003 ◎ C 01/21 01/21 0.001│ToDo│BoardRect 設置
 0004 ◎ C 01/21 01/21 0.001│ToDo│Board クラス追加
 0005 ◎ C 01/21 01/21 0.001│ToDo│BoardRect：グリッド線描画
-0006 ● C 01/21            │ToDo│
-0007 ● C 01/21            │ToDo│
-0008 ● C 01/21            │ToDo│
+0006 ◎ C 01/21 01/21 0.001│ToDo│Board.put_black, white(x, y)
+0007 ◎ C 01/21 01/21 0.001│ToDo│Board.print()
+0008 ● C 01/21            │ToDo│BoardRect：盤面石表示
 0009 ● C 01/21            │ToDo│
 0010 ● C 01/21            │ToDo│
