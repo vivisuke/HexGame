@@ -9,7 +9,7 @@ var GRID_HT = CELL_WD * (Board.BD_WIDTH-1)
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
-	print("CELL_WD = ", CELL_WD)
+	#print("CELL_WD = ", CELL_WD)
 	pass # Replace with function body.
 
 func xyToPos(x, y):

@@ -9,7 +9,7 @@
 0007 ◎ C 01/21 01/21 0.001│ToDo│Board.print()
 0008 ◎ C 01/21 01/22 0.001│ToDo│BoardRect：石表示関数
 0009 ● C 01/22            │ToDo│BoardRect：座標値表示
-0010 ● C 01/23            │ToDo│空が無くなるまでランダムゲーム可能に
+0010 ◎ C 01/23 01/23 0.001│ToDo│空が無くなるまでランダムゲーム可能に
 0011 ◎ C 01/23 01/23 0.001│ToDo│Board 状態を BoardRect で表示
 0012 ◎ C 01/23 01/23 0.001│ToDo│Board：盤面配列を1次元配列（PackedByteArray）に
 0013 ● C 01/23            │ToDo│
