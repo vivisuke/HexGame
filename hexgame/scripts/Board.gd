@@ -59,7 +59,7 @@ func put_col(x, y, col) -> bool:
 	if col == BLACK:
 		return find_horz(id, 0) && find_horz(id, N_HORZ-1)
 	else:
-		return find_vert(id, 0) && find_horz(id, N_HORZ-1)
+		return find_vert(id, 0) && find_vert(id, N_HORZ-1)
 func put_black(x, y):
 	m_cells[xyToIndex(x, y)] = BLACK
 func put_white(x, y):
