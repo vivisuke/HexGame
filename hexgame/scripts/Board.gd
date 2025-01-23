@@ -4,9 +4,9 @@ extends Node
 enum {
 	EMPTY = 0, BLACK, WHITE, WALL
 }
-const BD_WIDTH = 8
-const ARY_WIDTH = BD_WIDTH + 1
-const ARY_HEIGHT = BD_WIDTH + 2
+const N_HORZ = 8
+const ARY_WIDTH = N_HORZ + 1
+const ARY_HEIGHT = N_HORZ + 2
 const ARY_SIZE = ARY_WIDTH * ARY_HEIGHT
 #const col_str = ".XO#"
 const col_str = ". X O # "
@@ -14,22 +14,30 @@ const col_str = ". X O # "
 
 #var m_cells = []
 var m_cells : PackedByteArray
+var m_visited : PackedByteArray		# 0 for 未探索 or 空欄、1以上 for 島id
 
 func xyToIndex(x, y): return (y+1)*ARY_WIDTH + x
 
 func _init():
 	m_cells.resize(ARY_SIZE)
 	m_cells.fill(WALL)
-	for y in range(BD_WIDTH):
-		for x in range(BD_WIDTH):
+	m_visited.resize(ARY_SIZE)
+	for y in range(N_HORZ):
+		for x in range(N_HORZ):
 			m_cells[xyToIndex(x, y)] = EMPTY
 func print():
-	for y in range(BD_WIDTH):
+	for y in range(N_HORZ):
 		var txt = ""
-		for x in range(BD_WIDTH):
+		for x in range(N_HORZ):
 			txt += col_str.substr(m_cells[xyToIndex(x, y)]*2, 2)
 			#txt += "%d"%m_cells[xyToIndex(x, y)]
 			#print(m_cells[i])
+		print(txt)
+func print_visited():
+	for y in range(N_HORZ):
+		var txt = ""
+		for x in range(N_HORZ):
+			txt += "%3d"%m_visited[xyToIndex(x, y)]
 		print(txt)
 func get_col(x, y):
 	return m_cells[xyToIndex(x, y)]
@@ -41,14 +49,39 @@ func put_white(x, y):
 	m_cells[xyToIndex(x, y)] = WHITE
 func sel_move_random() -> Vector2:
 	var lst : PackedVector2Array
-	for y in range(BD_WIDTH):
-		for x in range(BD_WIDTH):
+	for y in range(N_HORZ):
+		for x in range(N_HORZ):
 			if m_cells[xyToIndex(x, y)] == EMPTY: lst.push_back(Vector2(x, y))
 	print("lst.size = ", lst.size())
 	if lst.size() != 0:
 		return lst[randi() % lst.size()]
 	else:
 		return Vector2(-1, -1)
+func check_connected_sub(ix, col, id):		# 深さ優先探索
+	m_visited[ix] = id
+	if m_cells[ix-ARY_WIDTH] == col && m_visited[ix-ARY_WIDTH] == 0:
+		check_connected_sub(ix-ARY_WIDTH, col, id)
+	if m_cells[ix-ARY_WIDTH+1] == col && m_visited[ix-ARY_WIDTH+1] == 0:
+		check_connected_sub(ix-ARY_WIDTH+1, col, id)
+	if m_cells[ix-1] == col && m_visited[ix-1] == 0:
+		check_connected_sub(ix-1, col, id)
+	if m_cells[ix+1] == col && m_visited[ix+1] == 0:
+		check_connected_sub(ix+1, col, id)
+	if m_cells[ix+ARY_WIDTH-1] == col && m_visited[ix+ARY_WIDTH-1] == 0:
+		check_connected_sub(ix+ARY_WIDTH-1, col, id)
+	if m_cells[ix+ARY_WIDTH] == col && m_visited[ix+ARY_WIDTH] == 0:
+		check_connected_sub(ix+ARY_WIDTH, col, id)
+func check_connected():
+	m_visited.fill(0)
+	var id = 0
+	for y in range(N_HORZ):
+		for x in range(N_HORZ):
+			var ix = xyToIndex(x, y)
+			var col = m_cells[ix]
+			if (col == BLACK || col == WHITE) && m_visited[ix] == 0:
+				id += 1
+				check_connected_sub(ix, col, id)
+
 func _ready():
 	pass # Replace with function body.
 func _process(delta):

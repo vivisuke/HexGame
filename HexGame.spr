@@ -14,8 +14,8 @@
 0012 ◎ C 01/23 01/23 0.001│ToDo│Board：盤面配列を1次元配列（PackedByteArray）に
 0013 ● C 01/23            │ToDo│勝敗判定
 0014 ◎ C 01/23 01/23 0.001│ToDo│盤面上下左右：青・ピンク線表示？
-0015 ● C 01/23            │ToDo│
-0016 ● C 01/23            │ToDo│
+0015 ◎ C 01/23 01/23 0.001│ToDo│BoardRect：xyToPos() 追加
+0016 ◎ C 01/23 01/23 0.001│ToDo│BD_WIDTH → N_HORZ にリネーム？
 0017 ● C 01/23            │ToDo│
 0018 ● C 01/23            │ToDo│
 0019 ● C 01/23            │ToDo│
