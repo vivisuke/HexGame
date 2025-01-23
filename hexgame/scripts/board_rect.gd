@@ -1,8 +1,8 @@
 extends ColorRect
 
 #const WHITE_COL = Color("pink")
-const WHITE_COL = Color("#f00000")
-const BLACK_COL = Color("#6060ff")
+const WHITE_COL = Color("#f00000")		# 赤系
+const BLACK_COL = Color("#6060ff")		# 青系
 const N_HORZ = Board.N_HORZ
 const N_VERT = Board.N_HORZ
 var CELL_WD = self.size.x / (Board.N_HORZ+1)

@@ -41,8 +41,25 @@ func print_visited():
 		print(txt)
 func get_col(x, y):
 	return m_cells[xyToIndex(x, y)]
-func put_col(x, y, col):
-	m_cells[xyToIndex(x, y)] = col
+func find_horz(id, y):
+	for x in range(N_HORZ):
+		if m_visited[xyToIndex(x, y)] == id:
+			return true
+	return false
+func find_vert(id, x):
+	for y in range(N_HORZ):
+		if m_visited[xyToIndex(x, y)] == id:
+			return true
+	return false
+func put_col(x, y, col) -> bool:
+	var ix = xyToIndex(x, y)
+	m_cells[ix] = col
+	check_connected()
+	var id = m_visited[ix]
+	if col == BLACK:
+		return find_horz(id, 0) && find_horz(id, N_HORZ-1)
+	else:
+		return find_vert(id, 0) && find_horz(id, N_HORZ-1)
 func put_black(x, y):
 	m_cells[xyToIndex(x, y)] = BLACK
 func put_white(x, y):
