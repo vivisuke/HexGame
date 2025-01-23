@@ -12,6 +12,7 @@ var GRID_WD = CELL_WD * (Board.N_HORZ-1)
 var GRID_HT = CELL_WD * (Board.N_HORZ-1)
 
 var bd
+var put_pos = Vector2(-1, -1)
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -20,6 +21,8 @@ func _ready():
 
 func xyToPos(x, y):
 	return Vector2(X0+CELL_WD*x, Y0+CELL_WD*y+CELL_WD*x/2.0)
+func vec2ToPos(vec2):
+	return xyToPos(vec2.x, vec2.y)
 func draw_stone(x, y, b):
 	#var col = Color("#6060ff") if b else Color("pink")
 	var col = BLACK_COL if b else WHITE_COL
@@ -49,11 +52,16 @@ func _draw():
 	#draw_stone(1, 1, true)
 	#draw_stone(2, 0, false)
 	#draw_stone(0, 2, false)
+	# 石描画
 	for y in range(BWD):
 		for x in range(BWD):
 			var col = bd.get_col(x, y)
 			if col != Board.EMPTY:
 				draw_stone(x, y, col == Board.BLACK)
+	# 着手箇所強調
+	var p = vec2ToPos(put_pos)
+	#draw_circle(p, CELL_WD*0.1, Color.WHITE)
+	draw_rect(Rect2(p-Vector2(5, 5), Vector2(10, 10)), Color.WHITE)
 	pass
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.

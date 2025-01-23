@@ -15,6 +15,9 @@ const col_str = ". X O # "
 #var m_cells = []
 var m_cells : PackedByteArray
 var m_visited : PackedByteArray		# 0 for 未探索 or 空欄、1以上 for 島id
+var m_dist : PackedByteArray		# 0 for 未探索、1以上 for 距離+1
+var m_ter_lst : PackedByteArray		# 末端位置リスト
+var m_next_ter : PackedByteArray	# 次の末端位置リスト
 
 func xyToIndex(x, y): return (y+1)*ARY_WIDTH + x
 
@@ -22,6 +25,7 @@ func _init():
 	m_cells.resize(ARY_SIZE)
 	m_cells.fill(WALL)
 	m_visited.resize(ARY_SIZE)
+	m_dist.resize(ARY_SIZE)
 	for y in range(N_HORZ):
 		for x in range(N_HORZ):
 			m_cells[xyToIndex(x, y)] = EMPTY
@@ -38,6 +42,12 @@ func print_visited():
 		var txt = ""
 		for x in range(N_HORZ):
 			txt += "%3d"%m_visited[xyToIndex(x, y)]
+		print(txt)
+func print_dist():
+	for y in range(N_HORZ):
+		var txt = ""
+		for x in range(N_HORZ):
+			txt += "%3d"%m_dist[xyToIndex(x, y)]
 		print(txt)
 func get_col(x, y):
 	return m_cells[xyToIndex(x, y)]
@@ -98,7 +108,41 @@ func check_connected():
 			if (col == BLACK || col == WHITE) && m_visited[ix] == 0:
 				id += 1
 				check_connected_sub(ix, col, id)
+func BFS_sub(dist, col):
+	#m_next_ter.clear()
+	m_next_ter = PackedByteArray()
+	for ix in m_ter_lst:
+		if m_cells[ix-ARY_WIDTH] == col && m_dist[ix-ARY_WIDTH] == 0:
+			m_dist[ix-ARY_WIDTH] = dist
+			m_next_ter.push_back(ix-ARY_WIDTH)
+		if m_cells[ix-ARY_WIDTH+1] == col && m_dist[ix-ARY_WIDTH+1] == 0:
+			m_dist[ix-ARY_WIDTH+1] = dist
+			m_next_ter.push_back(ix-ARY_WIDTH+1)
+		if m_cells[ix-1] == col && m_dist[ix-1] == 0:
+			m_dist[ix-1] = dist
+			m_next_ter.push_back(ix-1)
+		if m_cells[ix+1] == col && m_dist[ix+1] == 0:
+			m_dist[ix+1] = dist
+			m_next_ter.push_back(ix+1)
+		if m_cells[ix+ARY_WIDTH-1] == col && m_dist[ix+ARY_WIDTH-1] == 0:
+			m_dist[ix+ARY_WIDTH-1] = dist
+			m_next_ter.push_back(ix+ARY_WIDTH-1)
+		if m_cells[ix+ARY_WIDTH] == col && m_dist[ix+ARY_WIDTH] == 0:
+			m_dist[ix+ARY_WIDTH] = dist
+			m_next_ter.push_back(ix+ARY_WIDTH)
+	if m_next_ter.is_empty(): return
+	m_ter_lst = m_next_ter.duplicate()
+	BFS_sub(dist+1, col)
 
+func BFS(x, y):		# (x, y) から幅優先探索
+	m_dist.fill(0)
+	var ix = xyToIndex(x, y)
+	m_dist[ix] = 1
+	var col = m_cells[ix]
+	m_ter_lst = [ix]
+	BFS_sub(2, col)
+
+	pass
 func _ready():
 	pass # Replace with function body.
 func _process(delta):
