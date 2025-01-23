@@ -1,5 +1,8 @@
 extends ColorRect
 
+const WHITE_COL = Color("pink")
+const BLACK_COL = Color("#6060ff")
+
 var bd
 var CELL_WD = self.size.x / (Board.BD_WIDTH+1)
 var X0 = CELL_WD
@@ -15,11 +18,17 @@ func _ready():
 func xyToPos(x, y):
 	return Vector2(X0+CELL_WD*x, Y0+CELL_WD*y)
 func draw_stone(x, y, b):
-	var col = Color("#6060ff") if b else Color("red")
+	#var col = Color("#6060ff") if b else Color("pink")
+	var col = BLACK_COL if b else WHITE_COL
 	draw_circle(xyToPos(x, y), CELL_WD*0.4, col)
 	draw_circle(xyToPos(x, y), CELL_WD*0.4, Color.BLACK, false, 1.0, true)
 func _draw():
-	draw_rect(Rect2(X0, Y0, GRID_WD, GRID_HT), Color.BLACK, false, 3.0)
+	const FR_WD = 5.0
+	draw_line(Vector2(X0, Y0), Vector2(X0+GRID_WD, Y0), BLACK_COL, FR_WD)
+	draw_line(Vector2(X0, Y0+GRID_HT), Vector2(X0+GRID_WD, Y0+GRID_HT), BLACK_COL, FR_WD)
+	draw_line(Vector2(X0, Y0), Vector2(X0, Y0+GRID_HT), WHITE_COL, FR_WD)
+	draw_line(Vector2(X0+GRID_WD, Y0), Vector2(X0+GRID_WD, Y0+GRID_HT), WHITE_COL, FR_WD)
+	#draw_rect(Rect2(X0, Y0, GRID_WD, GRID_HT), Color.BLACK, false, 3.0)
 	const BWD = Board.BD_WIDTH
 	for i in range(1, BWD-1):
 		var t = Y0 + i * CELL_WD

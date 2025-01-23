@@ -9,7 +9,8 @@ func _ready():
 	#bd.put_white(1, 0)
 	#bd.print()
 	var next = Board.BLACK
-	for i in range(Board.BD_WIDTH * Board.BD_WIDTH):
+	#for i in range(Board.BD_WIDTH * Board.BD_WIDTH):
+	for i in range(16):
 		var pos = bd.sel_move_random()
 		print("put pos = ", pos)
 		bd.put_col(pos.x, pos.y, next)
