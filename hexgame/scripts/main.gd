@@ -12,6 +12,7 @@ func _ready():
 	#bd.put_white(1, 0)
 	#bd.print()
 	#var next = Board.BLACK
+	print_next()
 	if false:
 		#for i in range(Board.N_HORZ * Board.N_HORZ):
 		for i in range(64):
@@ -28,7 +29,11 @@ func _ready():
 		bd.check_connected()
 		bd.print_visited()
 	pass # Replace with function body.
-	
+func print_next():
+	if next == Board.BLACK:
+		$MessLabel.text = "青の手番です。"
+	else:
+		$MessLabel.text = "赤の手番です。"
 func _process(delta):
 	pass
 
@@ -56,4 +61,5 @@ func _on_next_button_pressed():
 	bd.BFS(pos.x, pos.y)
 	bd.print_dist()
 	next = (Board.BLACK + Board.WHITE) - next
+	print_next()
 	pass # Replace with function body.
