@@ -5,7 +5,7 @@ var next = Board.BLACK
 var game_over = false
 
 func _ready():
-	seed(0)
+	#seed(0)
 	bd = Board.new()
 	$BoardRect.bd = bd
 	#bd.put_black(0, 1)
@@ -50,6 +50,7 @@ func _on_next_button_pressed():
 		#bd.print_visited()
 		bd.BFS(pos.x, pos.y)
 		bd.print_dist()
+		$BoardRect.view_path = true
 		return
 	bd.BFS(pos.x, pos.y)
 	bd.print_dist()
