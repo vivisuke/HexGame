@@ -69,7 +69,7 @@ func _draw():
 		for y in range(BWD):
 			for x in range(BWD):
 				var ix = bd.xyToIndex(x, y)
-				if bd.m_dist[ix] != 0:
+				if bd.m_path[ix] != 0:
 					var p = xyToPos(x, y)
 					#draw_circle(p, CELL_WD*0.1, Color.WHITE)
 					draw_rect(Rect2(p-Vector2(5, 5), Vector2(10, 10)), Color.WHITE)

@@ -152,10 +152,46 @@ func min_dist_y(x):
 			mnv = m_dist[ix]
 			mny = y
 	return mny
-func get_shortest_path(red):
+func min_dist_x(y):
+	var mnv = 9999
+	var mnx = -1
+	for x in range(N_HORZ):
+		var ix = xyToIndex(x, y)
+		if m_dist[ix] != 0 && m_dist[ix] < mnv:
+			mnx = m_dist[ix]
+			mnx = x
+	return mnx
+func get_shortest_path_sub(ix):
+	while m_dist[ix] != 0:
+		var dist = m_dist[ix]
+		m_path[ix] = dist
+		dist -= 1
+		if m_dist[ix-ARY_WIDTH] == dist:
+			ix = ix - ARY_WIDTH
+		elif m_dist[ix-ARY_WIDTH+1] == dist:
+			ix = ix - ARY_WIDTH + 1
+		elif m_dist[ix-1] == dist:
+			ix = ix - 1
+		elif m_dist[ix+1] == dist:
+			ix = ix + 1
+		elif m_dist[ix+ARY_WIDTH-1] == dist:
+			ix = ix + ARY_WIDTH - 1
+		elif m_dist[ix+ARY_WIDTH] == dist:
+			ix = ix + ARY_WIDTH
+		else:
+			return
+func get_shortest_path(black):
 	m_path.fill(0)
-	if red:
+	if !black:
 		var y = min_dist_y(0)
+		get_shortest_path_sub(xyToIndex(0, y))
+		y = min_dist_y(N_HORZ-1)
+		get_shortest_path_sub(xyToIndex(N_HORZ-1, y))
+	else:
+		var x = min_dist_x(0)
+		get_shortest_path_sub(xyToIndex(x, 0))
+		x = min_dist_x(N_HORZ-1)
+		get_shortest_path_sub(xyToIndex(x, N_HORZ-1))
 func _ready():
 	pass # Replace with function body.
 func _process(delta):
