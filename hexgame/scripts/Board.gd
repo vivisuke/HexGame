@@ -4,7 +4,7 @@ extends Node
 enum {
 	EMPTY = 0, BLACK, WHITE, WALL
 }
-const N_HORZ = 8
+const N_HORZ = 11
 const ARY_WIDTH = N_HORZ + 1
 const ARY_HEIGHT = N_HORZ + 2
 const ARY_SIZE = ARY_WIDTH * ARY_HEIGHT
@@ -24,13 +24,16 @@ func xyToIndex(x, y): return (y+1)*ARY_WIDTH + x
 
 func _init():
 	m_cells.resize(ARY_SIZE)
-	m_cells.fill(WALL)
 	m_visited.resize(ARY_SIZE)
 	m_dist.resize(ARY_SIZE)
 	m_path.resize(ARY_SIZE)
+	m_cells.fill(WALL)
 	for y in range(N_HORZ):
 		for x in range(N_HORZ):
 			m_cells[xyToIndex(x, y)] = EMPTY
+func copy_from(s):
+	m_cells = s.m_cells.duplicate()
+
 func print():
 	for y in range(N_HORZ):
 		var txt = ""
