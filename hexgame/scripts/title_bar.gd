@@ -5,7 +5,7 @@ const RADIUS = 5
 func _draw():
 	var style_box = StyleBoxFlat.new()      # 影、ボーダなどを描画するための矩形スタイルオブジェクト
 	style_box.bg_color = color   # 矩形背景色
-	style_box.border_color = Color.GREEN
+	style_box.border_color = Color.YELLOW
 	style_box.set_border_width_all(2)
 	style_box.set_corner_radius_all(RADIUS)
 	style_box.shadow_offset = Vector2(0, 4)     # 影オフセット

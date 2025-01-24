@@ -37,6 +37,12 @@ func print_next():
 func _process(delta):
 	pass
 
+func _input(event):
+	if event is InputEventMouseButton && event.is_pressed():
+		var pos = get_global_mouse_position() - $BoardRect.position
+		print("pos = ", pos)
+		var xy = $BoardRect.posToXY(pos)
+		print("xy = ", xy)
 
 func _on_next_button_pressed():
 	if game_over: return

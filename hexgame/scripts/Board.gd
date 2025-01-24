@@ -4,7 +4,7 @@ extends Node
 enum {
 	EMPTY = 0, BLACK, WHITE, WALL
 }
-const N_HORZ = 11
+const N_HORZ = 6
 const ARY_WIDTH = N_HORZ + 1
 const ARY_HEIGHT = N_HORZ + 2
 const ARY_SIZE = ARY_WIDTH * ARY_HEIGHT

@@ -24,6 +24,12 @@ func xyToPos(x, y):
 	return Vector2(X0+CELL_WD*x, Y0+CELL_WD*y+CELL_WD*x/2.0)
 func vec2ToPos(vec2):
 	return xyToPos(vec2.x, vec2.y)
+func posToXY(pos : Vector2):
+	var x = pos.x - X0
+	var y = pos.y - Y0 - x/2.0
+	x = floor((x + CELL_WD/2.0)/CELL_WD)
+	y = floor((y + CELL_WD/2.0)/CELL_WD)
+	return Vector2(x, y)
 func draw_stone(x, y, b):
 	#var col = Color("#6060ff") if b else Color("pink")
 	var col = BLACK_COL if b else WHITE_COL
