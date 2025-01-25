@@ -4,7 +4,7 @@ extends Node
 enum {
 	EMPTY = 0, BLACK, WHITE, WALL
 }
-const N_HORZ = 6
+const N_HORZ = 9
 const ARY_WIDTH = N_HORZ + 1
 const ARY_HEIGHT = N_HORZ + 2
 const ARY_SIZE = ARY_WIDTH * ARY_HEIGHT
@@ -19,6 +19,7 @@ var m_dist : PackedByteArray		# 0 for 未探索、1以上 for 距離+1
 var m_path : PackedByteArray		# 1以上：最短パス
 var m_ter_lst : PackedByteArray		# 末端位置リスト
 var m_next_ter : PackedByteArray	# 次の末端位置リスト
+var m_eval : PackedInt32Array		# 各位置の着手価値
 
 func xyToIndex(x, y): return (y+1)*ARY_WIDTH + x
 
@@ -27,10 +28,15 @@ func _init():
 	m_visited.resize(ARY_SIZE)
 	m_dist.resize(ARY_SIZE)
 	m_path.resize(ARY_SIZE)
+	m_eval.resize(ARY_SIZE)
 	m_cells.fill(WALL)
 	for y in range(N_HORZ):
 		for x in range(N_HORZ):
 			m_cells[xyToIndex(x, y)] = EMPTY
+	if true:
+		for y in range(2, N_HORZ-1, 2):
+			for x in range(2, N_HORZ-1, 2):
+				m_cells[xyToIndex(x, y)] = WHITE
 func copy_from(s):
 	m_cells = s.m_cells.duplicate()
 
@@ -53,6 +59,12 @@ func print_dist():
 		var txt = ""
 		for x in range(N_HORZ):
 			txt += "%3d"%m_dist[xyToIndex(x, y)]
+		print(txt)
+func print_eval():
+	for y in range(N_HORZ):
+		var txt = ""
+		for x in range(N_HORZ):
+			txt += "%4d"%m_eval[xyToIndex(x, y)]
 		print(txt)
 func get_col(x, y):
 	return m_cells[xyToIndex(x, y)]
@@ -195,6 +207,18 @@ func get_shortest_path(black):
 		get_shortest_path_sub(xyToIndex(x, 0))
 		x = min_dist_x(N_HORZ-1)
 		get_shortest_path_sub(xyToIndex(x, N_HORZ-1))
+func eval_empty():
+	m_eval.fill(0)
+	for y in range(N_HORZ):
+		for x in range(N_HORZ):
+			var ix = xyToIndex(x, y)
+			if m_cells[ix] == EMPTY:
+				if m_cells[ix-ARY_WIDTH] != EMPTY && m_cells[ix-ARY_WIDTH] == m_cells[ix+ARY_WIDTH]:
+					m_eval[ix] += 100
+				if m_cells[ix-ARY_WIDTH+1] != EMPTY && m_cells[ix-ARY_WIDTH+1] == m_cells[ix+ARY_WIDTH-1]:
+					m_eval[ix] += 100
+				if m_cells[ix-1] != EMPTY && m_cells[ix-1] == m_cells[ix+1]:
+					m_eval[ix] += 100
 func _ready():
 	pass # Replace with function body.
 func _process(delta):
