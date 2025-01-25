@@ -75,7 +75,8 @@ func _input(event):
 func _on_next_button_pressed():
 	if game_over: return
 	#var pos = bd.sel_move_random()
-	var pos = bd.sel_move_maxeval()
+	#var pos = bd.sel_move_maxeval()
+	var pos = bd.sel_move_PMC(next)
 	print("put pos = ", pos)
 	do_put(pos)
 	pass # Replace with function body.

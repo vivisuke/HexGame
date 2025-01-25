@@ -4,7 +4,7 @@ extends Node
 enum {
 	EMPTY = 0, BLACK, WHITE, BWALL, WWALL
 }
-const N_HORZ = 9
+const N_HORZ = 7
 const ARY_WIDTH = N_HORZ + 1
 const ARY_HEIGHT = N_HORZ + 2
 const ARY_SIZE = ARY_WIDTH * ARY_HEIGHT
@@ -79,7 +79,7 @@ func find_vert(id, x):
 		if m_visited[xyToIndex(x, y)] == id:
 			return true
 	return false
-func put_col(x, y, col) -> bool:
+func put_col(x, y, col) -> bool:	# col: BLACK or WHITE
 	var ix = xyToIndex(x, y)
 	m_cells[ix] = col
 	check_connected()
@@ -97,7 +97,7 @@ func sel_move_random() -> Vector2:
 	for y in range(N_HORZ):
 		for x in range(N_HORZ):
 			if m_cells[xyToIndex(x, y)] == EMPTY: lst.push_back(Vector2(x, y))
-	print("lst.size = ", lst.size())
+	#print("lst.size = ", lst.size())
 	if lst.size() != 0:
 		return lst[randi() % lst.size()]
 	else:
@@ -252,6 +252,43 @@ func eval_empty():
 					m_eval[ix] += 10
 				elif is_black_or_white(ix+ARY_WIDTH) && m_cells[ix-ARY_WIDTH] == EMPTY:
 					m_eval[ix] += 10
+# ランダム着手によるプレイアウト
+# return 
+func playout_random(next) -> int:		# return 勝者 BLACK or WHITE
+	var b2 = Board.new()
+	b2.copy_from(self)
+	while true:
+		var mv = b2.sel_move_random()
+		if b2.put_col(mv.x, mv.y, next):
+			return next
+		next = (BLACK + WHITE) - next
+	return 0
+func sel_move_PMC(next) -> Vector2:			# 純粋モンテカルロ法による着手選択
+	var wc = PackedByteArray()
+	wc.resize(ARY_SIZE)
+	wc.fill(0)
+	for i in range(10):
+		for y in range(N_HORZ):
+			for x in range(N_HORZ):
+				var ix = xyToIndex(x, y)
+				if m_cells[ix] == EMPTY:
+					if playout_random(next) == next:
+						wc[ix] += 1
+	print("wc[] = ")
+	for y in range(N_HORZ):
+		var txt = ""
+		for x in range(N_HORZ):
+			txt += "%3d"%wc[xyToIndex(x, y)]
+		print(txt)
+	var mxc = 0
+	var v2 = 0
+	for y in range(N_HORZ):
+		for x in range(N_HORZ):
+			var ix = xyToIndex(x, y)
+			if wc[ix] > mxc:
+				mxc = wc[ix]
+				v2 = Vector2(x, y)
+	return v2
 func _ready():
 	pass # Replace with function body.
 func _process(delta):
