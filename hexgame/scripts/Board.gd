@@ -102,6 +102,22 @@ func sel_move_random() -> Vector2:
 		return lst[randi() % lst.size()]
 	else:
 		return Vector2(-1, -1)
+func sel_move_maxeval() -> Vector2:
+	var lst : PackedVector2Array
+	var mxev = -1
+	for y in range(N_HORZ):
+		for x in range(N_HORZ):
+			var ix = xyToIndex(x, y)
+			if m_eval[ix] > mxev:
+				mxev = m_eval[ix]
+				lst.clear()
+				lst.push_back(Vector2(x, y))
+			elif m_eval[ix] == mxev:
+				lst.push_back(Vector2(x, y))
+	if lst.size() != 0:
+		return lst[randi() % lst.size()]
+	else:
+		return Vector2(-1, -1)
 func check_connected_sub(ix, col, id):		# 深さ優先探索
 	m_visited[ix] = id
 	if m_cells[ix-ARY_WIDTH] == col && m_visited[ix-ARY_WIDTH] == 0:
@@ -208,18 +224,34 @@ func get_shortest_path(black):
 		get_shortest_path_sub(xyToIndex(x, 0))
 		x = min_dist_x(N_HORZ-1)
 		get_shortest_path_sub(xyToIndex(x, N_HORZ-1))
+func is_black_or_white(ix):
+	return m_cells[ix] == BLACK || m_cells[ix] == WHITE
 func eval_empty():
 	m_eval.fill(0)
 	for y in range(N_HORZ):
 		for x in range(N_HORZ):
 			var ix = xyToIndex(x, y)
 			if m_cells[ix] == EMPTY:
+				m_eval[ix] += 1
 				if m_cells[ix-ARY_WIDTH] != EMPTY && m_cells[ix-ARY_WIDTH] == m_cells[ix+ARY_WIDTH]:
 					m_eval[ix] += 100
 				if m_cells[ix-ARY_WIDTH+1] != EMPTY && m_cells[ix-ARY_WIDTH+1] == m_cells[ix+ARY_WIDTH-1]:
 					m_eval[ix] += 100
 				if m_cells[ix-1] != EMPTY && m_cells[ix-1] == m_cells[ix+1]:
 					m_eval[ix] += 100
+				#
+				if is_black_or_white(ix-ARY_WIDTH) && m_cells[ix+ARY_WIDTH] == EMPTY:
+					m_eval[ix] += 10
+				elif is_black_or_white(ix-ARY_WIDTH+1) && m_cells[ix+ARY_WIDTH-1] == EMPTY:
+					m_eval[ix] += 10
+				elif is_black_or_white(ix-1) && m_cells[ix+1] == EMPTY:
+					m_eval[ix] += 10
+				elif is_black_or_white(ix+1) && m_cells[ix-1] == EMPTY:
+					m_eval[ix] += 10
+				elif is_black_or_white(ix+ARY_WIDTH-1) && m_cells[ix-ARY_WIDTH+1] == EMPTY:
+					m_eval[ix] += 10
+				elif is_black_or_white(ix+ARY_WIDTH) && m_cells[ix-ARY_WIDTH] == EMPTY:
+					m_eval[ix] += 10
 func _ready():
 	pass # Replace with function body.
 func _process(delta):
