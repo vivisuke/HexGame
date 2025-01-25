@@ -2,7 +2,7 @@ class_name Board
 extends Node
 
 enum {
-	EMPTY = 0, BLACK, WHITE, WALL
+	EMPTY = 0, BLACK, WHITE, BWALL, WWALL
 }
 const N_HORZ = 9
 const ARY_WIDTH = N_HORZ + 1
@@ -29,8 +29,9 @@ func _init():
 	m_dist.resize(ARY_SIZE)
 	m_path.resize(ARY_SIZE)
 	m_eval.resize(ARY_SIZE)
-	m_cells.fill(WALL)
+	m_cells.fill(BWALL)			# 青壁 for 上下
 	for y in range(N_HORZ):
+		m_cells[xyToIndex(-1, y)] = WWALL		# 赤壁 for 左右
 		for x in range(N_HORZ):
 			m_cells[xyToIndex(x, y)] = EMPTY
 	if true:
