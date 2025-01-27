@@ -15,7 +15,7 @@ const col_str = ". X O # "
 #var m_cells = []
 var m_next_id = 1
 var m_cells : PackedByteArray
-var m_group_id : PackedByteArray	# 0 for 未探索 or 空欄、1以上 for 連結石群 id
+var m_gid : PackedByteArray	# 0 for 未探索 or 空欄、1以上 for 連結石群 id
 var m_dist : PackedByteArray		# 0 for 未探索、1以上 for 距離+1
 var m_path : PackedByteArray		# 1以上：最短パス
 var m_ter_lst : PackedByteArray		# 末端位置リスト
@@ -26,7 +26,7 @@ func xyToIndex(x, y): return (y+1)*ARY_WIDTH + x
 
 func _init():
 	m_cells.resize(ARY_SIZE)
-	m_group_id.resize(ARY_SIZE)
+	m_gid.resize(ARY_SIZE)
 	m_dist.resize(ARY_SIZE)
 	m_path.resize(ARY_SIZE)
 	m_eval.resize(ARY_SIZE)
@@ -44,7 +44,7 @@ func _init():
 func copy_from(s):
 	m_next_id = s.m_next_id
 	m_cells = s.m_cells.duplicate()
-	m_group_id = s.m_group_id				# 島id 配列
+	m_gid = s.m_gid.duplicate()			# グループid 配列
 
 func print():
 	for y in range(N_HORZ):
@@ -54,12 +54,12 @@ func print():
 			#txt += "%d"%m_cells[xyToIndex(x, y)]
 			#print(m_cells[i])
 		print(txt)
-func print_group_id():
-	print("m_group_id[] = ")
+func print_gid():
+	print("m_gid[] = ")
 	for y in range(N_HORZ):
 		var txt = ""
 		for x in range(N_HORZ):
-			txt += "%3d"%m_group_id[xyToIndex(x, y)]
+			txt += "%3d"%m_gid[xyToIndex(x, y)]
 		print(txt)
 func print_dist():
 	print("m_dist[] = ")
@@ -79,22 +79,22 @@ func get_col(x, y):
 	return m_cells[xyToIndex(x, y)]
 func find_horz(id, y):
 	for x in range(N_HORZ):
-		if m_group_id[xyToIndex(x, y)] == id:
+		if m_gid[xyToIndex(x, y)] == id:
 			return true
 	return false
 func find_vert(id, x):
 	for y in range(N_HORZ):
-		if m_group_id[xyToIndex(x, y)] == id:
+		if m_gid[xyToIndex(x, y)] == id:
 			return true
 	return false
 func put_col(x, y, col) -> bool:	# col: BLACK or WHITE
 	var ix = xyToIndex(x, y)
 	m_cells[ix] = col
 	#check_connected()
-	update_connected(x, y)
-	var id = m_group_id[ix]
+	update_gid(x, y)
+	var id = m_gid[ix]
 	if col == BLACK:
-		return find_horz(id, 0) && find_horz(id, N_HORZ-1)
+		return find_horz(id, 0) && find_horz(id, N_HORZ-1)	# 上辺・下辺に打った箇所と同じ gid の石があるか？
 	else:
 		return find_vert(id, 0) && find_vert(id, N_HORZ-1)
 func put_black(x, y):
@@ -127,33 +127,51 @@ func sel_move_maxeval() -> Vector2:
 		return lst[randi() % lst.size()]
 	else:
 		return Vector2(-1, -1)
-func update_connected(x, y):		# put_col() からコールされる
+func update_gid_sub(ix, ix2):
+	if m_cells[ix] != m_cells[ix2]:		# 同じ石色でない場合
+		return
+	if m_gid[ix] == 0:		# 最初の連結の場合
+		m_gid[ix] = m_gid[ix2]
+	elif m_gid[ix] != m_gid[ix2]:		# グループid のマージが必要
+		var o = m_gid[ix2]
+		var n = m_gid[ix]
+		for i in range(xyToIndex(0, 0), xyToIndex(N_HORZ-1, N_HORZ-1)+1):
+			if m_gid[i] == o:
+				m_gid[i] = n
+func update_gid(x, y):		# put_col() からコールされる
 	var ix = xyToIndex(x, y)
-	m_group_id[ix] = m_next_id
-	m_next_id += 1
+	update_gid_sub(ix, ix-ARY_WIDTH)
+	update_gid_sub(ix, ix-ARY_WIDTH+1)
+	update_gid_sub(ix, ix-1)
+	update_gid_sub(ix, ix+1)
+	update_gid_sub(ix, ix+ARY_WIDTH-1)
+	update_gid_sub(ix, ix+ARY_WIDTH)
+	if m_gid[ix] == 0:
+		m_gid[ix] = m_next_id
+		m_next_id += 1
 	pass
 func check_connected_sub(ix, col, id):		# 深さ優先探索
-	m_group_id[ix] = id
-	if m_cells[ix-ARY_WIDTH] == col && m_group_id[ix-ARY_WIDTH] == 0:
+	m_gid[ix] = id
+	if m_cells[ix-ARY_WIDTH] == col && m_gid[ix-ARY_WIDTH] == 0:
 		check_connected_sub(ix-ARY_WIDTH, col, id)
-	if m_cells[ix-ARY_WIDTH+1] == col && m_group_id[ix-ARY_WIDTH+1] == 0:
+	if m_cells[ix-ARY_WIDTH+1] == col && m_gid[ix-ARY_WIDTH+1] == 0:
 		check_connected_sub(ix-ARY_WIDTH+1, col, id)
-	if m_cells[ix-1] == col && m_group_id[ix-1] == 0:
+	if m_cells[ix-1] == col && m_gid[ix-1] == 0:
 		check_connected_sub(ix-1, col, id)
-	if m_cells[ix+1] == col && m_group_id[ix+1] == 0:
+	if m_cells[ix+1] == col && m_gid[ix+1] == 0:
 		check_connected_sub(ix+1, col, id)
-	if m_cells[ix+ARY_WIDTH-1] == col && m_group_id[ix+ARY_WIDTH-1] == 0:
+	if m_cells[ix+ARY_WIDTH-1] == col && m_gid[ix+ARY_WIDTH-1] == 0:
 		check_connected_sub(ix+ARY_WIDTH-1, col, id)
-	if m_cells[ix+ARY_WIDTH] == col && m_group_id[ix+ARY_WIDTH] == 0:
+	if m_cells[ix+ARY_WIDTH] == col && m_gid[ix+ARY_WIDTH] == 0:
 		check_connected_sub(ix+ARY_WIDTH, col, id)
 func check_connected():
-	m_group_id.fill(0)
+	m_gid.fill(0)
 	var id = 0
 	for y in range(N_HORZ):
 		for x in range(N_HORZ):
 			var ix = xyToIndex(x, y)
 			var col = m_cells[ix]
-			if (col == BLACK || col == WHITE) && m_group_id[ix] == 0:
+			if (col == BLACK || col == WHITE) && m_gid[ix] == 0:
 				id += 1
 				check_connected_sub(ix, col, id)
 func BFS_sub(dist, col):
