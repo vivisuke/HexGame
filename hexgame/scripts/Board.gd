@@ -13,8 +13,9 @@ const col_str = ". X O # "
 #const col_str = "・●◯＃"
 
 #var m_cells = []
+var m_next_id = 1
 var m_cells : PackedByteArray
-var m_visited : PackedByteArray		# 0 for 未探索 or 空欄、1以上 for 島id
+var m_group_id : PackedByteArray	# 0 for 未探索 or 空欄、1以上 for 連結石群 id
 var m_dist : PackedByteArray		# 0 for 未探索、1以上 for 距離+1
 var m_path : PackedByteArray		# 1以上：最短パス
 var m_ter_lst : PackedByteArray		# 末端位置リスト
@@ -25,7 +26,7 @@ func xyToIndex(x, y): return (y+1)*ARY_WIDTH + x
 
 func _init():
 	m_cells.resize(ARY_SIZE)
-	m_visited.resize(ARY_SIZE)
+	m_group_id.resize(ARY_SIZE)
 	m_dist.resize(ARY_SIZE)
 	m_path.resize(ARY_SIZE)
 	m_eval.resize(ARY_SIZE)
@@ -35,11 +36,15 @@ func _init():
 		for x in range(N_HORZ):
 			m_cells[xyToIndex(x, y)] = EMPTY
 	if true:
-		for y in range(2, N_HORZ-1, 2):
-			for x in range(2, N_HORZ-1, 2):
+		for y in range(1, N_HORZ-1, 2):
+			for x in range(1, N_HORZ-1, 2):
 				m_cells[xyToIndex(x, y)] = WHITE
+				m_next_id += 1
+		check_connected()
 func copy_from(s):
+	m_next_id = s.m_next_id
 	m_cells = s.m_cells.duplicate()
+	m_group_id = s.m_group_id				# 島id 配列
 
 func print():
 	for y in range(N_HORZ):
@@ -49,19 +54,22 @@ func print():
 			#txt += "%d"%m_cells[xyToIndex(x, y)]
 			#print(m_cells[i])
 		print(txt)
-func print_visited():
+func print_group_id():
+	print("m_group_id[] = ")
 	for y in range(N_HORZ):
 		var txt = ""
 		for x in range(N_HORZ):
-			txt += "%3d"%m_visited[xyToIndex(x, y)]
+			txt += "%3d"%m_group_id[xyToIndex(x, y)]
 		print(txt)
 func print_dist():
+	print("m_dist[] = ")
 	for y in range(N_HORZ):
 		var txt = ""
 		for x in range(N_HORZ):
 			txt += "%3d"%m_dist[xyToIndex(x, y)]
 		print(txt)
 func print_eval():
+	print("m_eval[] = ")
 	for y in range(N_HORZ):
 		var txt = ""
 		for x in range(N_HORZ):
@@ -71,19 +79,20 @@ func get_col(x, y):
 	return m_cells[xyToIndex(x, y)]
 func find_horz(id, y):
 	for x in range(N_HORZ):
-		if m_visited[xyToIndex(x, y)] == id:
+		if m_group_id[xyToIndex(x, y)] == id:
 			return true
 	return false
 func find_vert(id, x):
 	for y in range(N_HORZ):
-		if m_visited[xyToIndex(x, y)] == id:
+		if m_group_id[xyToIndex(x, y)] == id:
 			return true
 	return false
 func put_col(x, y, col) -> bool:	# col: BLACK or WHITE
 	var ix = xyToIndex(x, y)
 	m_cells[ix] = col
-	check_connected()
-	var id = m_visited[ix]
+	#check_connected()
+	update_connected(x, y)
+	var id = m_group_id[ix]
 	if col == BLACK:
 		return find_horz(id, 0) && find_horz(id, N_HORZ-1)
 	else:
@@ -118,28 +127,33 @@ func sel_move_maxeval() -> Vector2:
 		return lst[randi() % lst.size()]
 	else:
 		return Vector2(-1, -1)
+func update_connected(x, y):		# put_col() からコールされる
+	var ix = xyToIndex(x, y)
+	m_group_id[ix] = m_next_id
+	m_next_id += 1
+	pass
 func check_connected_sub(ix, col, id):		# 深さ優先探索
-	m_visited[ix] = id
-	if m_cells[ix-ARY_WIDTH] == col && m_visited[ix-ARY_WIDTH] == 0:
+	m_group_id[ix] = id
+	if m_cells[ix-ARY_WIDTH] == col && m_group_id[ix-ARY_WIDTH] == 0:
 		check_connected_sub(ix-ARY_WIDTH, col, id)
-	if m_cells[ix-ARY_WIDTH+1] == col && m_visited[ix-ARY_WIDTH+1] == 0:
+	if m_cells[ix-ARY_WIDTH+1] == col && m_group_id[ix-ARY_WIDTH+1] == 0:
 		check_connected_sub(ix-ARY_WIDTH+1, col, id)
-	if m_cells[ix-1] == col && m_visited[ix-1] == 0:
+	if m_cells[ix-1] == col && m_group_id[ix-1] == 0:
 		check_connected_sub(ix-1, col, id)
-	if m_cells[ix+1] == col && m_visited[ix+1] == 0:
+	if m_cells[ix+1] == col && m_group_id[ix+1] == 0:
 		check_connected_sub(ix+1, col, id)
-	if m_cells[ix+ARY_WIDTH-1] == col && m_visited[ix+ARY_WIDTH-1] == 0:
+	if m_cells[ix+ARY_WIDTH-1] == col && m_group_id[ix+ARY_WIDTH-1] == 0:
 		check_connected_sub(ix+ARY_WIDTH-1, col, id)
-	if m_cells[ix+ARY_WIDTH] == col && m_visited[ix+ARY_WIDTH] == 0:
+	if m_cells[ix+ARY_WIDTH] == col && m_group_id[ix+ARY_WIDTH] == 0:
 		check_connected_sub(ix+ARY_WIDTH, col, id)
 func check_connected():
-	m_visited.fill(0)
+	m_group_id.fill(0)
 	var id = 0
 	for y in range(N_HORZ):
 		for x in range(N_HORZ):
 			var ix = xyToIndex(x, y)
 			var col = m_cells[ix]
-			if (col == BLACK || col == WHITE) && m_visited[ix] == 0:
+			if (col == BLACK || col == WHITE) && m_group_id[ix] == 0:
 				id += 1
 				check_connected_sub(ix, col, id)
 func BFS_sub(dist, col):

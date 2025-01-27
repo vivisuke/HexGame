@@ -13,6 +13,7 @@ func _ready():
 	#bd.print()
 	#var next = Board.BLACK
 	print_next()
+	bd.print_group_id()
 	bd.eval_empty()
 	bd.print_eval()
 	if false:
@@ -29,7 +30,7 @@ func _ready():
 			$MessLabel.text = "赤の勝ちです。"
 		bd.print()
 		bd.check_connected()
-		bd.print_visited()
+		bd.print_group_id()
 	pass # Replace with function body.
 func print_next():
 	if next == Board.BLACK:
@@ -50,7 +51,7 @@ func do_put(pos):
 			$MessLabel.text = "赤の勝ちです。"
 		bd.print()
 		#bd.check_connected()
-		#bd.print_visited()
+		bd.print_group_id()
 		bd.BFS(pos.x, pos.y)
 		bd.print_dist()
 		bd.get_shortest_path(next == Board.BLACK)
@@ -60,6 +61,7 @@ func do_put(pos):
 		bd.print_dist()
 		next = (Board.BLACK + Board.WHITE) - next
 		print_next()
+		bd.print_group_id()
 		bd.eval_empty()
 		bd.print_eval()
 func _input(event):
@@ -75,8 +77,8 @@ func _input(event):
 func _on_next_button_pressed():
 	if game_over: return
 	#var pos = bd.sel_move_random()
-	#var pos = bd.sel_move_maxeval()
-	var pos = bd.sel_move_PMC(next)
+	var pos = bd.sel_move_maxeval()
+	#var pos = bd.sel_move_PMC(next)
 	print("put pos = ", pos)
 	do_put(pos)
 	pass # Replace with function body.
