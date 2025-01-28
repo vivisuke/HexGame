@@ -7,6 +7,7 @@ var game_over = false
 func _ready():
 	#seed(1)
 	bd = Board.new()
+	var mcts = MCTS.new(bd, Board.BLACK, Board.WHITE)
 	$BoardRect.bd = bd
 	#bd.put_black(0, 1)
 	#bd.put_white(1, 0)
@@ -44,6 +45,7 @@ func do_put(pos):
 	$BoardRect.put_pos = pos
 	$BoardRect.queue_redraw()
 	if bd.put_col(pos.x, pos.y, next):
+		# 終局した場合
 		game_over = true
 		if next == Board.BLACK:
 			$MessLabel.text = "青の勝ちです。"
@@ -57,12 +59,12 @@ func do_put(pos):
 		bd.get_shortest_path(next == Board.BLACK)
 		$BoardRect.view_path = true
 	else:
-		bd.print()
+		#bd.print()
 		bd.BFS(pos.x, pos.y)
-		bd.print_dist()
+		#bd.print_dist()
 		next = (Board.BLACK + Board.WHITE) - next
 		print_next()
-		bd.print_gid()
+		#bd.print_gid()
 		bd.eval_empty()
 		bd.print_eval()
 func _input(event):

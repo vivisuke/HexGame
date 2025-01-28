@@ -286,31 +286,35 @@ func eval_empty():
 					m_eval[ix] += 10
 # ランダム着手によるプレイアウト
 # return 
-func playout_random(next) -> int:		# return 勝者 BLACK or WHITE
+# return 勝者 BLACK or WHITE
+func playout_random(next, x, y) -> int:		# 次を (x, y) に打ち、その後はランダム
 	var b2 = Board.new()
 	b2.copy_from(self)
+	if b2.put_col(x, y, next):
+		return next
 	while true:
+		next = (BLACK + WHITE) - next
 		var mv = b2.sel_move_random()
 		if b2.put_col(mv.x, mv.y, next):
 			return next
-		next = (BLACK + WHITE) - next
 	return 0
 func sel_move_PMC(next) -> Vector2:			# 純粋モンテカルロ法による着手選択
 	var wc = PackedByteArray()
 	wc.resize(ARY_SIZE)
 	wc.fill(0)
-	for i in range(10):
-		for y in range(N_HORZ):
-			for x in range(N_HORZ):
-				var ix = xyToIndex(x, y)
-				if m_cells[ix] == EMPTY:
-					if playout_random(next) == next:
+	const CNT = 10
+	for y in range(N_HORZ):
+		for x in range(N_HORZ):
+			var ix = xyToIndex(x, y)
+			if m_cells[ix] == EMPTY:
+				for i in range(CNT):
+					if playout_random(next, x, y) == next:
 						wc[ix] += 1
 	print("wc[] = ")
 	for y in range(N_HORZ):
 		var txt = ""
 		for x in range(N_HORZ):
-			txt += "%3d"%wc[xyToIndex(x, y)]
+			txt += "%3d%%"%(wc[xyToIndex(x, y)]*100/CNT)
 		print(txt)
 	var mxc = 0
 	var v2 = 0
