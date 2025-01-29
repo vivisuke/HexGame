@@ -39,6 +39,7 @@ func _init():
 				m_next_id += 1
 		check_connected()
 func init():
+	m_gid.fill(0)
 	for y in range(N_HORZ):
 		m_cells[xyToIndex(-1, y)] = WWALL		# 赤壁 for 左右
 		for x in range(N_HORZ):

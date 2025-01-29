@@ -36,6 +36,7 @@ func _ready():
 		bd.print_gid()
 	pass # Replace with function body.
 func init_board():
+	game_over = false
 	next = Board.BLACK
 	bd.init()
 	$BoardRect.queue_redraw()
