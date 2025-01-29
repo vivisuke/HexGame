@@ -44,9 +44,9 @@
 0040 ● C 01/27            │ToDo│純粋MC：勝率を%表示
 0040 ◎ C 01/28 01/28 0.001│ToDo│class MCTSNode 追加
 0040 ◎ C 01/28 01/28 0.001│ToDo│class MCTS 追加
-0040 ● C 01/28            │ToDo│着手は Vector2 → Vector2i に変更
-0040 ● C 01/28            │ToDo│
-0040 ● C 01/28            │ToDo│
-0040 ● C 01/28            │ToDo│
-0040 ● C 01/28            │ToDo│
-0040 ● C 01/28            │ToDo│
+0040 ● C 01/28            │ToDo│とりあえず、すべての空欄を MCTS.root に追加可能に
+0040 ● C 01/28            │ToDo│MCTS.print(), MCTSNode.print()
+0040 ● C 01/29            │ToDo│MCTSNode：メンバ変数から盤面情報を削除
+0040 ◎ C 01/30 01/30 0.001│ToDo│初期化ボタン設置
+0040 ● C 01/30            │問題│初期化後に、着手選択が行われない
+0040 ● C 01/30            │ToDo│

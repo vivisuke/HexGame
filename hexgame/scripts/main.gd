@@ -8,6 +8,8 @@ func _ready():
 	#seed(1)
 	bd = Board.new()
 	var mcts = MCTS.new(bd, Board.BLACK, Board.WHITE)
+	mcts.add_children()
+	mcts.print()
 	$BoardRect.bd = bd
 	#bd.put_black(0, 1)
 	#bd.put_white(1, 0)
@@ -33,6 +35,10 @@ func _ready():
 		bd.check_connected()
 		bd.print_gid()
 	pass # Replace with function body.
+func init_board():
+	next = Board.BLACK
+	bd.init()
+	$BoardRect.queue_redraw()
 func print_next():
 	if next == Board.BLACK:
 		$MessLabel.text = "青の手番です。"
@@ -82,6 +88,15 @@ func _on_next_button_pressed():
 	#var pos = bd.sel_move_random()
 	#var pos = bd.sel_move_maxeval()
 	var pos = bd.sel_move_PMC(next)
+	var mcts = MCTS.new(bd, Board.BLACK, Board.WHITE)
+	mcts.add_children()
+	mcts.print()
 	print("put pos = ", pos)
 	do_put(pos)
+	pass # Replace with function body.
+
+
+func _on_restart_button_pressed():
+	init_board()
+	$BoardRect.init()
 	pass # Replace with function body.

@@ -4,7 +4,7 @@ extends Node
 enum {
 	EMPTY = 0, BLACK, WHITE, BWALL, WWALL
 }
-const N_HORZ = 7
+const N_HORZ = 3
 const ARY_WIDTH = N_HORZ + 1
 const ARY_HEIGHT = N_HORZ + 2
 const ARY_SIZE = ARY_WIDTH * ARY_HEIGHT
@@ -31,16 +31,18 @@ func _init():
 	m_path.resize(ARY_SIZE)
 	m_eval.resize(ARY_SIZE)
 	m_cells.fill(BWALL)			# 青壁 for 上下
-	for y in range(N_HORZ):
-		m_cells[xyToIndex(-1, y)] = WWALL		# 赤壁 for 左右
-		for x in range(N_HORZ):
-			m_cells[xyToIndex(x, y)] = EMPTY
-	if true:
+	init()
+	if false:
 		for y in range(1, N_HORZ-1, 2):
 			for x in range(1, N_HORZ-1, 2):
 				m_cells[xyToIndex(x, y)] = WHITE
 				m_next_id += 1
 		check_connected()
+func init():
+	for y in range(N_HORZ):
+		m_cells[xyToIndex(-1, y)] = WWALL		# 赤壁 for 左右
+		for x in range(N_HORZ):
+			m_cells[xyToIndex(x, y)] = EMPTY
 func copy_from(s):
 	m_next_id = s.m_next_id
 	m_cells = s.m_cells.duplicate()
@@ -302,7 +304,7 @@ func sel_move_PMC(next) -> Vector2:			# 純粋モンテカルロ法による着�
 	var wc = PackedByteArray()
 	wc.resize(ARY_SIZE)
 	wc.fill(0)
-	const CNT = 10
+	const CNT = 100
 	for y in range(N_HORZ):
 		for x in range(N_HORZ):
 			var ix = xyToIndex(x, y)
@@ -314,10 +316,10 @@ func sel_move_PMC(next) -> Vector2:			# 純粋モンテカルロ法による着�
 	for y in range(N_HORZ):
 		var txt = ""
 		for x in range(N_HORZ):
-			txt += "%3d%%"%(wc[xyToIndex(x, y)]*100/CNT)
+			txt += " %3d%%"%(wc[xyToIndex(x, y)]*100/CNT)
 		print(txt)
 	var mxc = 0
-	var v2 = 0
+	var v2 = Vector2(-1, -1)
 	for y in range(N_HORZ):
 		for x in range(N_HORZ):
 			var ix = xyToIndex(x, y)

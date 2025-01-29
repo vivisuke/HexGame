@@ -19,6 +19,9 @@ var view_path = false			# bd.m_dist != 0 部分強調
 func _ready():
 	#print("CELL_WD = ", CELL_WD)
 	pass # Replace with function body.
+func init():
+	put_pos = Vector2(-1, -1)
+	view_path = false			# bd.m_dist != 0 部分強調
 
 func xyToPos(x, y):
 	return Vector2(X0+CELL_WD*x, Y0+CELL_WD*y+CELL_WD*x/2.0)
