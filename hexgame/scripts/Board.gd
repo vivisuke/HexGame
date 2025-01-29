@@ -328,6 +328,11 @@ func sel_move_PMC(next) -> Vector2:			# 純粋モンテカルロ法による着�
 				mxc = wc[ix]
 				v2 = Vector2(x, y)
 	return v2
+func sel_move_MCTS(next):
+	var mcts = MCTS.new(self, next)
+	mcts.add_children()
+	mcts.print()
+	return sel_move_random()
 func _ready():
 	pass # Replace with function body.
 func _process(delta):

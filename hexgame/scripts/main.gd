@@ -7,9 +7,9 @@ var game_over = false
 func _ready():
 	#seed(1)
 	bd = Board.new()
-	var mcts = MCTS.new(bd, Board.BLACK, Board.WHITE)
-	mcts.add_children()
-	mcts.print()
+	#var mcts = MCTS.new(bd, Board.BLACK, Board.WHITE)
+	#mcts.add_children()
+	#mcts.print()
 	$BoardRect.bd = bd
 	#bd.put_black(0, 1)
 	#bd.put_white(1, 0)
@@ -88,10 +88,11 @@ func _on_next_button_pressed():
 	if game_over: return
 	#var pos = bd.sel_move_random()
 	#var pos = bd.sel_move_maxeval()
-	var pos = bd.sel_move_PMC(next)
-	var mcts = MCTS.new(bd, Board.BLACK, Board.WHITE)
-	mcts.add_children()
-	mcts.print()
+	#var pos = bd.sel_move_PMC(next)
+	var pos = bd.sel_move_MCTS(next)
+	#var mcts = MCTS.new(bd, Board.BLACK, Board.WHITE)
+	#mcts.add_children()
+	#mcts.print()
 	print("put pos = ", pos)
 	do_put(pos)
 	pass # Replace with function body.

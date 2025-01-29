@@ -45,16 +45,16 @@ class MCTSNode:
 var root_node: MCTSNode
 var board_size: int
 var player_color: int # MCTSで探索するプレイヤーの色
-var opponent_color: int
+#var opponent_color: int
 #var heuristic_calculator: HexHeuristicValueCalculator # ヒューリスティック計算クラス
 
 var c_puct = 1.5 # UCB の探索パラメータ (調整可能)
 var rollout_depth_limit = 50 # ロールアウトの深さ制限 (無限ループ対策)
 
-func _init(board: Board, p_color: int, o_color: int):
+func _init(board: Board, p_color: int):
 	board_size = Board.N_HORZ
 	player_color = p_color
-	opponent_color = o_color
+	#opponent_color = o_color
 	root_node = MCTSNode.new(null, Vector2(-1, -1)) # 初期盤面を根ノードとする
 	#heuristic_calculator = HexHeuristicValueCalculator.new(board_size)
 	#
