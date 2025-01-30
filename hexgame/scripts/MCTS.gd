@@ -43,6 +43,7 @@ class MCTSNode:
 		return exploitation_term + exploration_term
 
 var root_node: MCTSNode
+var board : Board
 var board_size: int
 var player_color: int # MCTSで探索するプレイヤーの色
 #var opponent_color: int
@@ -51,7 +52,8 @@ var player_color: int # MCTSで探索するプレイヤーの色
 var c_puct = 1.5 # UCB の探索パラメータ (調整可能)
 var rollout_depth_limit = 50 # ロールアウトの深さ制限 (無限ループ対策)
 
-func _init(board: Board, p_color: int):
+func _init(board: Board, p_color: int):		# p_color: 次の手番色
+	self.board = board
 	board_size = Board.N_HORZ
 	player_color = p_color
 	#opponent_color = o_color
@@ -62,6 +64,11 @@ func _init(board: Board, p_color: int):
 		for x in range(board_size):
 			if board.get_col(x, y) == Board.EMPTY:
 				root_node.children.push_back(MCTSNode.new(root_node, Vector2(x, y), player_color))
+				root_node.children.back().visits = 1
+				var bd = Board.new()
+				bd.copy_from(board)
+				if bd.playout_random(p_color, x, y) == p_color:
+					root_node.children.back().wins = 1
 func print():
 	print("MCTSNode:")
 	root_node.print(0)
