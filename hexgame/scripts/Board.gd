@@ -4,7 +4,7 @@ extends Node
 enum {
 	EMPTY = 0, BLACK, WHITE, BWALL, WWALL
 }
-const N_HORZ = 4
+const N_HORZ = 3
 const ARY_WIDTH = N_HORZ + 1
 const ARY_HEIGHT = N_HORZ + 2
 const ARY_SIZE = ARY_WIDTH * ARY_HEIGHT
@@ -332,9 +332,9 @@ func sel_move_PMC(next) -> Vector2:			# 純粋モンテカルロ法による着�
 func sel_move_MCTS(next):
 	var mcts = MCTS.new(self, next)
 	#mcts.add_children()
-	var mv = mcts.do_search(1000)
+	var mv = mcts.do_search(10)
 	win_rate = mcts.win_rate
-	#mcts.print()
+	mcts.print()
 	return mv
 func _ready():
 	pass # Replace with function body.
