@@ -45,7 +45,8 @@ class MCTSNode:
 var root_node: MCTSNode
 var board : Board
 var board_size: int
-var player_color: int # MCTSで探索するプレイヤーの色
+var player_color: int	# MCTSで探索するプレイヤーの色
+var win_rate = 0.0		# 期待勝率
 #var opponent_color: int
 #var heuristic_calculator: HexHeuristicValueCalculator # ヒューリスティック計算クラス
 
@@ -88,7 +89,15 @@ func do_search(iterations: int) -> Vector2:
 		var node : MCTSNode = root_node # 探索開始ノードを根ノードに設定
 		node = node.select_child_ucb(c_puct, node.visits) # UCB で子ノードを選択
 		do_rollout(board, node, player_color)
-	return Vector2(-1, -1)
+	var mv = Vector2(-1, -1)
+	#var mx = -INF
+	win_rate = -INF
+	for node in root_node.children:
+		if float(node.wins)/node.visits > win_rate:
+			win_rate = float(node.wins)/node.visits
+			mv = node.move
+	print("max w/v = %.1f%%"%(win_rate*100))
+	return mv
 func search(iterations: int) -> Vector2i:
 	for i in range(iterations):
 		var node = root_node # 探索開始ノードを根ノードに設定

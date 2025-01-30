@@ -90,6 +90,7 @@ func _on_next_button_pressed():
 	#var pos = bd.sel_move_maxeval()
 	#var pos = bd.sel_move_PMC(next)
 	var pos = bd.sel_move_MCTS(next)
+	$EvalLabel.text = "WR = %.1f%%" % (bd.win_rate*100)
 	#var mcts = MCTS.new(bd, Board.BLACK, Board.WHITE)
 	#mcts.add_children()
 	#mcts.print()

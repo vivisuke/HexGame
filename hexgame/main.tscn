@@ -32,6 +32,17 @@ theme_override_font_sizes/font_size = 24
 text = "Message"
 vertical_alignment = 1
 
+[node name="EvalLabel" type="Label" parent="."]
+offset_left = 294.0
+offset_top = 63.0
+offset_right = 488.0
+offset_bottom = 100.0
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_font_sizes/font_size = 24
+text = "WR = N/A"
+horizontal_alignment = 2
+vertical_alignment = 1
+
 [node name="BoardRect" type="ColorRect" parent="."]
 offset_left = 20.0
 offset_top = 100.0

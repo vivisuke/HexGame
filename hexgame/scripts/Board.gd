@@ -4,7 +4,7 @@ extends Node
 enum {
 	EMPTY = 0, BLACK, WHITE, BWALL, WWALL
 }
-const N_HORZ = 5
+const N_HORZ = 4
 const ARY_WIDTH = N_HORZ + 1
 const ARY_HEIGHT = N_HORZ + 2
 const ARY_SIZE = ARY_WIDTH * ARY_HEIGHT
@@ -14,6 +14,7 @@ const col_str = ". X O # "
 
 #var m_cells = []
 var m_next_id = 1
+var win_rate = 0.0
 var m_cells : PackedByteArray
 var m_gid : PackedByteArray	# 0 for 未探索 or 空欄、1以上 for 連結石群 id
 var m_dist : PackedByteArray		# 0 for 未探索、1以上 for 距離+1
@@ -33,8 +34,8 @@ func _init():
 	m_cells.fill(BWALL)			# 青壁 for 上下
 	init()
 	if false:
-		for y in range(1, N_HORZ-1, 2):
-			for x in range(1, N_HORZ-1, 2):
+		for y in range(2, N_HORZ-1, 2):
+			for x in range(2, N_HORZ-1, 2):
 				m_cells[xyToIndex(x, y)] = WHITE
 				m_next_id += 1
 		check_connected()
@@ -331,9 +332,10 @@ func sel_move_PMC(next) -> Vector2:			# 純粋モンテカルロ法による着�
 func sel_move_MCTS(next):
 	var mcts = MCTS.new(self, next)
 	#mcts.add_children()
-	mcts.do_search(1000)
-	mcts.print()
-	return sel_move_random()
+	var mv = mcts.do_search(1000)
+	win_rate = mcts.win_rate
+	#mcts.print()
+	return mv
 func _ready():
 	pass # Replace with function body.
 func _process(delta):
