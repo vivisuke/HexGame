@@ -21,7 +21,7 @@ class MCTSNode:
 	func print(lvl):
 		if lvl != 0:
 			var txt = " ".repeat(lvl*2)
-			txt += "(%d, %d): w/v = %d/%d"%[move.x, move.y, wins, visits]
+			txt += "(%d, %d):%4d%% (%d/%d)"%[move.x, move.y, wins*100/visits, wins, visits]
 			print(txt)
 		for node in children:
 			node.print(lvl+1)
@@ -63,17 +63,32 @@ func _init(board: Board, p_color: int):		# p_color: 次の手番色
 	for y in range(board_size):
 		for x in range(board_size):
 			if board.get_col(x, y) == Board.EMPTY:
+				root_node.visits += 1
 				root_node.children.push_back(MCTSNode.new(root_node, Vector2(x, y), player_color))
 				root_node.children.back().visits = 1
 				var bd = Board.new()
 				bd.copy_from(board)
 				if bd.playout_random(p_color, x, y) == p_color:
 					root_node.children.back().wins = 1
+func do_rollout(board : Board, node : MCTSNode, col):
+	var bd = Board.new()
+	bd.copy_from(board)
+	var x = node.move.x
+	var y = node.move.y
+	node.visits += 1
+	if bd.playout_random(col, x, y) == col:
+		node.wins += 1
 func print():
 	print("MCTSNode:")
 	root_node.print(0)
 func add_children():
 	pass
+func do_search(iterations: int) -> Vector2:
+	for i in range(iterations):
+		var node : MCTSNode = root_node # 探索開始ノードを根ノードに設定
+		node = node.select_child_ucb(c_puct, node.visits) # UCB で子ノードを選択
+		do_rollout(board, node, player_color)
+	return Vector2(-1, -1)
 func search(iterations: int) -> Vector2i:
 	for i in range(iterations):
 		var node = root_node # 探索開始ノードを根ノードに設定
