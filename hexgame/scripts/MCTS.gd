@@ -21,7 +21,9 @@ class MCTSNode:
 	func print(lvl):
 		if lvl != 0:
 			var txt = " ".repeat(lvl*2)
-			txt += "(%d, %d):%4d%% (%d/%d)"%[move.x, move.y, wins*100/visits, wins, visits]
+			txt += "(%d, %d):%d/%d"%[move.x, move.y, wins, visits]
+			if visits != 0:
+				txt += " = %.1f%%"%(wins*100/visits)
 			print(txt)
 		for node in children:
 			node.print(lvl+1)
@@ -31,7 +33,7 @@ class MCTSNode:
 		var best_ucb = -INF # 無限小
 		for child in children:
 			var ucb_value = calculate_ucb(child, c_puct, parent_visits)
-			print("ucb_value = ", ucb_value)
+			#print("ucb_value = ", ucb_value)
 			if ucb_value > best_ucb:
 				best_ucb = ucb_value
 				best_child = child
@@ -89,13 +91,13 @@ func do_expand_node(node, rbd, col):
 	for y in range(board_size):
 		for x in range(board_size):
 			if board.get_col(x, y) == Board.EMPTY:
-				node.visits += 1
+				#node.visits += 1
 				node.children.push_back(MCTSNode.new(node, Vector2(x, y)))
-				node.children.back().visits = 1
-				var bd = Board.new()
-				bd.copy_from(rbd)
-				if bd.playout_random(col, x, y) == col:
-					root_node.children.back().wins = 1
+				#node.children.back().visits = 1
+				#var bd = Board.new()
+				#bd.copy_from(rbd)
+				#if bd.playout_random(col, x, y) == col:
+				#	root_node.children.back().wins = 1
 	
 func do_search(iterations: int) -> Vector2:
 	for i in range(iterations):

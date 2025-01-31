@@ -332,7 +332,7 @@ func sel_move_PMC(next) -> Vector2:			# 純粋モンテカルロ法による着�
 func sel_move_MCTS(next):
 	var mcts = MCTS.new(self, next)
 	#mcts.add_children()
-	var mv = mcts.do_search(11)
+	var mv = mcts.do_search(10)
 	win_rate = mcts.win_rate
 	mcts.print()
 	return mv
