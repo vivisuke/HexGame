@@ -31,6 +31,7 @@ class MCTSNode:
 		var best_ucb = -INF # 無限小
 		for child in children:
 			var ucb_value = calculate_ucb(child, c_puct, parent_visits)
+			print("ucb_value = ", ucb_value)
 			if ucb_value > best_ucb:
 				best_ucb = ucb_value
 				best_child = child
@@ -38,8 +39,8 @@ class MCTSNode:
 	func calculate_ucb(node: MCTSNode, c_puct: float, parent_visits: int) -> float:
 		if node.visits == 0:
 			return INF # 未訪問ノードは優先的に探索
-		var exploitation_term = float(node.wins) / node.visits # 活用 (勝率)
-		var exploration_term = c_puct * sqrt(log(parent_visits) / float(node.visits)) # 探索
+		var exploitation_term : float = float(node.wins) / node.visits # 活用 (勝率)
+		var exploration_term : float = c_puct * sqrt(log(parent_visits) / float(node.visits)) # 探索
 		return exploitation_term + exploration_term
 
 var root_node: MCTSNode
@@ -101,8 +102,9 @@ func do_search(iterations: int) -> Vector2:
 		var bd = Board.new()
 		bd.copy_from(board)
 		var col = player_color			# 次の手番色
+		root_node.visits += 1
 		var node : MCTSNode = root_node # 探索開始ノードを根ノードに設定
-		node = node.select_child_ucb(c_puct, node.visits) # UCB で子ノードを選択
+		#node = node.select_child_ucb(c_puct, node.visits) # UCB で子ノードを選択
 		var go = false
 		while !node.children.is_empty():
 			node = node.select_child_ucb(c_puct, node.visits) # UCB で子ノードを選択
