@@ -87,7 +87,7 @@ func print():
 	root_node.print(0)
 func add_children():
 	pass
-func do_expand_node(node, rbd, col):
+func do_expand_node(node, rbd):
 	for y in range(board_size):
 		for x in range(board_size):
 			if board.get_col(x, y) == Board.EMPTY:
@@ -119,8 +119,9 @@ func do_search(iterations: int) -> Vector2:
 			continue
 		# ノード展開（Expansion）
 		if node.visits != 0 && node.children.is_empty():
-			var o_col = (Board.BLACK + Board.WHITE) - col
-			do_expand_node(node, bd, o_col)
+			#var o_col = (Board.BLACK + Board.WHITE) - col
+			do_expand_node(node, bd)
+			node = node.children[node.children.size()/2]
 		# ロールアウト（Rollout）
 		do_rollout(bd, node, col)
 	# 出来上がったツリーから最善手を求める
@@ -131,6 +132,7 @@ func do_search(iterations: int) -> Vector2:
 			win_rate = float(node.wins)/node.visits
 			mv = node.move
 	print("max w/v = %.1f%%"%(win_rate*100))
+	print("root_node.visits = ", root_node.visits)
 	return mv
 func search(iterations: int) -> Vector2i:
 	for i in range(iterations):
