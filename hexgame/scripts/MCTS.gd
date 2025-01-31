@@ -10,7 +10,7 @@ class MCTSNode:
 	var prior_probability = 0.0		# 事前確率 (必要に応じて使用)
 	var move : Vector2				# 親ノードからこのノードへの着手
 	
-	func _init(parent_node, move_made : Vector2, col=Board.EMPTY):
+	func _init(parent_node, move_made : Vector2):
 		##self.board_state = board_state.copy_from(board_state)
 		#self.board_state = Board.new()
 		#self.board_state.copy_from(board_state)
@@ -64,13 +64,13 @@ func _init(board: Board, p_color: int):		# p_color: 次の手番色
 	for y in range(board_size):
 		for x in range(board_size):
 			if board.get_col(x, y) == Board.EMPTY:
-				root_node.visits += 1
-				root_node.children.push_back(MCTSNode.new(root_node, Vector2(x, y), player_color))
-				root_node.children.back().visits = 1
-				var bd = Board.new()
-				bd.copy_from(board)
-				if bd.playout_random(p_color, x, y) == p_color:
-					root_node.children.back().wins = 1
+				root_node.children.push_back(MCTSNode.new(root_node, Vector2(x, y)))
+				#root_node.visits += 1
+				#root_node.children.back().visits = 1
+				#var bd = Board.new()
+				#bd.copy_from(board)
+				#if bd.playout_random(p_color, x, y) == p_color:
+				#	root_node.children.back().wins = 1
 func do_rollout(board : Board, node : MCTSNode, col):
 	var bd = Board.new()
 	bd.copy_from(board)
@@ -89,7 +89,7 @@ func do_expand_node(node, rbd, col):
 		for x in range(board_size):
 			if board.get_col(x, y) == Board.EMPTY:
 				node.visits += 1
-				node.children.push_back(MCTSNode.new(node, Vector2(x, y), player_color))
+				node.children.push_back(MCTSNode.new(node, Vector2(x, y)))
 				node.children.back().visits = 1
 				var bd = Board.new()
 				bd.copy_from(rbd)
@@ -106,6 +106,7 @@ func do_search(iterations: int) -> Vector2:
 		var go = false
 		while !node.children.is_empty():
 			node = node.select_child_ucb(c_puct, node.visits) # UCB で子ノードを選択
+			#if node.visits == 0: break		# 未評価ノードの場合
 			if bd.put_col(node.move.x, node.move.y, col):		# 終局
 				go = true
 				break;
@@ -113,7 +114,7 @@ func do_search(iterations: int) -> Vector2:
 		if go:
 			continue
 		# ノード展開（Expansion）
-		if node.children.is_empty():
+		if node.visits != 0 && node.children.is_empty():
 			var o_col = (Board.BLACK + Board.WHITE) - col
 			do_expand_node(node, bd, o_col)
 		# ロールアウト（Rollout）
