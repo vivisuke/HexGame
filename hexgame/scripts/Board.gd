@@ -5,7 +5,7 @@ enum {
 	#EMPTY = 0, BLACK, WHITE, BWALL, WWALL
 	EMPTY = 0, BLUE, RED, BWALL, WWALL
 }
-const N_HORZ = 2
+const N_HORZ = 5
 const ARY_WIDTH = N_HORZ + 1
 const ARY_HEIGHT = N_HORZ + 2
 const ARY_SIZE = ARY_WIDTH * ARY_HEIGHT

@@ -93,10 +93,12 @@ func print():
 func add_children():
 	pass
 func do_expand_node(node, rbd):
+	var px = node.move.x
+	var py = node.move.y
 	var oc = (Board.BLUE + Board.RED) - node.move.z
 	for y in range(board_size):
 		for x in range(board_size):
-			if board.get_col(x, y) == Board.EMPTY:
+			if rbd.get_col(x, y) == Board.EMPTY:
 				#node.visits += 1
 				node.children.push_back(MCTSNode.new(node, Vector3i(x, y, oc)))
 				#node.children.back().visits = 1
