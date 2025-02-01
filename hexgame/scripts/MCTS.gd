@@ -79,9 +79,11 @@ func do_rollout(board : Board, node : MCTSNode, col):
 	bd.copy_from(board)
 	var x = node.move.x
 	var y = node.move.y
-	node.visits += 1
-	if bd.playout_random(col, x, y) == col:
-		node.wins += 1
+	#node.visits += 1
+	var wcol = bd.playout_random(col, x, y)
+	#if wcol == col:
+	#	node.wins += 1
+	return wcol
 func print():
 	print("MCTSNode:")
 	root_node.print(0)
@@ -99,12 +101,20 @@ func do_expand_node(node, rbd):
 				#if bd.playout_random(col, x, y) == col:
 				#	root_node.children.back().wins = 1
 	
+func do_backpropagate(node: MCTSNode, col, wcol):
+	#var current_node = node
+	while node != null:
+		node.visits += 1
+		if col == wcol:
+			node.wins += 1
+		col = (Board.BLACK + Board.WHITE) - col
+		node = node.parent
 func do_search(iterations: int) -> Vector2:
 	for i in range(iterations):
 		var bd = Board.new()
 		bd.copy_from(board)
 		var col = player_color			# 次の手番色
-		root_node.visits += 1
+		#root_node.visits += 1
 		var node : MCTSNode = root_node # 探索開始ノードを根ノードに設定
 		#node = node.select_child_ucb(c_puct, node.visits) # UCB で子ノードを選択
 		var go = false
@@ -123,7 +133,9 @@ func do_search(iterations: int) -> Vector2:
 			do_expand_node(node, bd)
 			node = node.children[node.children.size()/2]
 		# ロールアウト（Rollout）
-		do_rollout(bd, node, col)
+		var wcol = do_rollout(bd, node, col)
+		#
+		do_backpropagate(node, col, wcol)
 	# 出来上がったツリーから最善手を求める
 	var mv = Vector2(-1, -1)
 	win_rate = -INF
@@ -132,7 +144,7 @@ func do_search(iterations: int) -> Vector2:
 			win_rate = float(node.wins)/node.visits
 			mv = node.move
 	print("max w/v = %.1f%%"%(win_rate*100))
-	print("root_node.visits = ", root_node.visits)
+	print("root_node.win/visits = %d/%d" % [root_node.wins, root_node.visits])
 	return mv
 func search(iterations: int) -> Vector2i:
 	for i in range(iterations):

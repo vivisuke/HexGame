@@ -5,7 +5,7 @@ var next = Board.BLACK
 var game_over = false
 
 func _ready():
-	#seed(1)
+	seed(1)
 	bd = Board.new()
 	#var mcts = MCTS.new(bd, Board.BLACK, Board.WHITE)
 	#mcts.add_children()
