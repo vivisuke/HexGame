@@ -8,9 +8,9 @@ class MCTSNode:
 	var visits = 0		# 訪問回数
 	var wins = 0		# 勝利回数 (ロールアウトで勝利した場合にカウント)
 	var prior_probability = 0.0		# 事前確率 (必要に応じて使用)
-	var move : Vector2				# 親ノードからこのノードへの着手
+	var move : Vector3i				# 親ノードからこのノードへの着手（x, y, col）
 	
-	func _init(parent_node, move_made : Vector2):
+	func _init(parent_node, move_made : Vector3i):
 		##self.board_state = board_state.copy_from(board_state)
 		#self.board_state = Board.new()
 		#self.board_state.copy_from(board_state)
@@ -61,28 +61,31 @@ func _init(board: Board, p_color: int):		# p_color: 次の手番色
 	board_size = Board.N_HORZ
 	player_color = p_color
 	#opponent_color = o_color
-	root_node = MCTSNode.new(null, Vector2(-1, -1)) # 初期盤面を根ノードとする
+	root_node = MCTSNode.new(null, Vector3i(-1, -1, -1)) # 初期盤面を根ノードとする
 	#heuristic_calculator = HexHeuristicValueCalculator.new(board_size)
 	#
 	for y in range(board_size):
 		for x in range(board_size):
 			if board.get_col(x, y) == Board.EMPTY:
-				root_node.children.push_back(MCTSNode.new(root_node, Vector2(x, y)))
+				root_node.children.push_back(MCTSNode.new(root_node, Vector3i(x, y, p_color)))
 				#root_node.visits += 1
 				#root_node.children.back().visits = 1
 				#var bd = Board.new()
 				#bd.copy_from(board)
 				#if bd.playout_random(p_color, x, y) == p_color:
 				#	root_node.children.back().wins = 1
-func do_rollout(board : Board, node : MCTSNode, col):
+func do_rollout(board : Board, node : MCTSNode):
 	var bd = Board.new()
 	bd.copy_from(board)
 	var x = node.move.x
 	var y = node.move.y
+	var col = node.move.z
 	#node.visits += 1
 	var wcol = bd.playout_random(col, x, y)
 	#if wcol == col:
 	#	node.wins += 1
+	#if x == 0 && y == 4:
+	#	print(node.move, "wcol = ", wcol)
 	return wcol
 func print():
 	print("MCTSNode:")
@@ -90,11 +93,12 @@ func print():
 func add_children():
 	pass
 func do_expand_node(node, rbd):
+	var oc = (Board.BLUE + Board.RED) - node.move.z
 	for y in range(board_size):
 		for x in range(board_size):
 			if board.get_col(x, y) == Board.EMPTY:
 				#node.visits += 1
-				node.children.push_back(MCTSNode.new(node, Vector2(x, y)))
+				node.children.push_back(MCTSNode.new(node, Vector3i(x, y, oc)))
 				#node.children.back().visits = 1
 				#var bd = Board.new()
 				#bd.copy_from(rbd)
@@ -107,7 +111,7 @@ func do_backpropagate(node: MCTSNode, col, wcol):
 		node.visits += 1
 		if col == wcol:
 			node.wins += 1
-		col = (Board.BLACK + Board.WHITE) - col
+		col = (Board.BLUE + Board.RED) - col
 		node = node.parent
 func do_search(iterations: int) -> Vector2:
 	for i in range(iterations):
@@ -118,32 +122,34 @@ func do_search(iterations: int) -> Vector2:
 		var node : MCTSNode = root_node # 探索開始ノードを根ノードに設定
 		#node = node.select_child_ucb(c_puct, node.visits) # UCB で子ノードを選択
 		var go = false
+		var wcol
 		while !node.children.is_empty():
 			node = node.select_child_ucb(c_puct, node.visits) # UCB で子ノードを選択
 			#if node.visits == 0: break		# 未評価ノードの場合
-			if bd.put_col(node.move.x, node.move.y, col):		# 終局
+			if bd.put_col(node.move.x, node.move.y, node.move.z):		# 終局
 				#node.wins += 1
+				wcol = node.move.z
 				go = true
 				break;
-			col = (Board.BLACK + Board.WHITE) - col
-		var wcol = col
+			#col = (Board.BLUE + Board.RED) - col
 		if !go:
 			# ノード展開（Expansion）
-			##if node.visits != 0 && node.children.is_empty():
-			##	#var o_col = (Board.BLACK + Board.WHITE) - col
-			##	do_expand_node(node, bd)
-			##	node = node.children[node.children.size()/2]
+			if node.visits != 0 && node.children.is_empty():
+				#var o_col = (Board.BLUE + Board.RED) - col
+				do_expand_node(node, bd)
+				node = node.children[node.children.size()/2]
 			# ロールアウト（Rollout）
-			wcol = do_rollout(bd, node, col)
+			wcol = do_rollout(bd, node)
 		#
-		do_backpropagate(node, col, wcol)
+		do_backpropagate(node, node.move.z, wcol)
 	# 出来上がったツリーから最善手を求める
 	var mv = Vector2(-1, -1)
 	win_rate = -INF
 	for node in root_node.children:
 		if float(node.wins)/node.visits > win_rate:
 			win_rate = float(node.wins)/node.visits
-			mv = node.move
+			mv.x = node.move.x
+			mv.y = node.move.y
 	print("max w/v = %.1f%%"%(win_rate*100))
 	print("root_node.win/visits = %d/%d" % [root_node.wins, root_node.visits])
 	return mv

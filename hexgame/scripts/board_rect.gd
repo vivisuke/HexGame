@@ -67,7 +67,7 @@ func _draw():
 		for x in range(BWD):
 			var col = bd.get_col(x, y)
 			if col != Board.EMPTY:
-				draw_stone(x, y, col == Board.BLACK)
+				draw_stone(x, y, col == Board.BLUE)
 	# 着手箇所強調
 	if put_pos.x >= 0:
 		var p = vec2ToPos(put_pos)

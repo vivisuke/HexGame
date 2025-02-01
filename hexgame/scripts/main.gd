@@ -1,20 +1,16 @@
 extends Node2D
 
 var bd
-var next = Board.BLACK
+var next = Board.BLUE
 var game_over = false
 
 func _ready():
 	seed(1)
 	bd = Board.new()
-	#var mcts = MCTS.new(bd, Board.BLACK, Board.WHITE)
-	#mcts.add_children()
-	#mcts.print()
 	$BoardRect.bd = bd
 	#bd.put_black(0, 1)
 	#bd.put_white(1, 0)
 	#bd.print()
-	#var next = Board.BLACK
 	print_next()
 	bd.print_gid()
 	bd.eval_empty()
@@ -26,8 +22,8 @@ func _ready():
 			print("put pos = ", pos)
 			if bd.put_col(pos.x, pos.y, next):
 				break
-			next = (Board.BLACK + Board.WHITE) - next
-		if next == Board.BLACK:
+			next = (Board.BLUE + Board.RED) - next
+		if next == Board.BLUE:
 			$MessLabel.text = "青の勝ちです。"
 		else:
 			$MessLabel.text = "赤の勝ちです。"
@@ -37,11 +33,11 @@ func _ready():
 	pass # Replace with function body.
 func init_board():
 	game_over = false
-	next = Board.BLACK
+	next = Board.BLUE
 	bd.init()
 	$BoardRect.queue_redraw()
 func print_next():
-	if next == Board.BLACK:
+	if next == Board.BLUE:
 		$MessLabel.text = "青の手番です。"
 	else:
 		$MessLabel.text = "赤の手番です。"
@@ -54,7 +50,7 @@ func do_put(pos):
 	if bd.put_col(pos.x, pos.y, next):
 		# 終局した場合
 		game_over = true
-		if next == Board.BLACK:
+		if next == Board.BLUE:
 			$MessLabel.text = "青の勝ちです。"
 		else:
 			$MessLabel.text = "赤の勝ちです。"
@@ -63,13 +59,13 @@ func do_put(pos):
 		bd.print_gid()
 		bd.BFS(pos.x, pos.y)
 		bd.print_dist()
-		bd.get_shortest_path(next == Board.BLACK)
+		bd.get_shortest_path(next == Board.BLUE)
 		$BoardRect.view_path = true
 	else:
 		#bd.print()
 		bd.BFS(pos.x, pos.y)
 		#bd.print_dist()
-		next = (Board.BLACK + Board.WHITE) - next
+		next = (Board.BLUE + Board.RED) - next
 		print_next()
 		#bd.print_gid()
 		bd.eval_empty()
@@ -91,7 +87,7 @@ func _on_next_button_pressed():
 	#var pos = bd.sel_move_PMC(next)
 	var pos = bd.sel_move_MCTS(next)
 	$EvalLabel.text = "WR = %.1f%%" % (bd.win_rate*100)
-	#var mcts = MCTS.new(bd, Board.BLACK, Board.WHITE)
+	#var mcts = MCTS.new(bd, Board.BLUE, Board.RED)
 	#mcts.add_children()
 	#mcts.print()
 	print("put pos = ", pos)

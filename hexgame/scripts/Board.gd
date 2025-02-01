@@ -2,9 +2,10 @@ class_name Board
 extends Node
 
 enum {
-	EMPTY = 0, BLACK, WHITE, BWALL, WWALL
+	#EMPTY = 0, BLACK, WHITE, BWALL, WWALL
+	EMPTY = 0, BLUE, RED, BWALL, WWALL
 }
-const N_HORZ = 5
+const N_HORZ = 2
 const ARY_WIDTH = N_HORZ + 1
 const ARY_HEIGHT = N_HORZ + 2
 const ARY_SIZE = ARY_WIDTH * ARY_HEIGHT
@@ -33,10 +34,10 @@ func _init():
 	m_eval.resize(ARY_SIZE)
 	m_cells.fill(BWALL)			# 青壁 for 上下
 	init()
-	if true:
-		for y in range(1, N_HORZ-1, 2):
-			for x in range(1, N_HORZ-1, 2):
-				m_cells[xyToIndex(x, y)] = WHITE
+	if false:
+		for y in range(2, N_HORZ-1, 2):
+			for x in range(2, N_HORZ-1, 2):
+				m_cells[xyToIndex(x, y)] = RED
 				m_next_id += 1
 		check_connected()
 func init():
@@ -91,20 +92,20 @@ func find_vert(id, x):
 		if m_gid[xyToIndex(x, y)] == id:
 			return true
 	return false
-func put_col(x, y, col) -> bool:	# col: BLACK or WHITE
+func put_col(x, y, col) -> bool:	# col: BLUE or RED
 	var ix = xyToIndex(x, y)
 	m_cells[ix] = col
 	#check_connected()
 	update_gid(x, y)
 	var id = m_gid[ix]
-	if col == BLACK:
+	if col == BLUE:
 		return find_horz(id, 0) && find_horz(id, N_HORZ-1)	# 上辺・下辺に打った箇所と同じ gid の石があるか？
 	else:
 		return find_vert(id, 0) && find_vert(id, N_HORZ-1)
 func put_black(x, y):
-	m_cells[xyToIndex(x, y)] = BLACK
+	m_cells[xyToIndex(x, y)] = BLUE
 func put_white(x, y):
-	m_cells[xyToIndex(x, y)] = WHITE
+	m_cells[xyToIndex(x, y)] = RED
 func sel_move_random() -> Vector2:
 	var lst : PackedVector2Array
 	for y in range(N_HORZ):
@@ -175,7 +176,7 @@ func check_connected():
 		for x in range(N_HORZ):
 			var ix = xyToIndex(x, y)
 			var col = m_cells[ix]
-			if (col == BLACK || col == WHITE) && m_gid[ix] == 0:
+			if (col == BLUE || col == RED) && m_gid[ix] == 0:
 				id += 1
 				check_connected_sub(ix, col, id)
 func BFS_sub(dist, col):
@@ -261,7 +262,7 @@ func get_shortest_path(black):
 		x = min_dist_x(N_HORZ-1)
 		get_shortest_path_sub(xyToIndex(x, N_HORZ-1))
 func is_black_or_white(ix):
-	return m_cells[ix] == BLACK || m_cells[ix] == WHITE
+	return m_cells[ix] == BLUE || m_cells[ix] == RED
 func eval_empty():
 	m_eval.fill(0)
 	for y in range(N_HORZ):
@@ -290,14 +291,14 @@ func eval_empty():
 					m_eval[ix] += 10
 # ランダム着手によるプレイアウト
 # return 
-# return 勝者 BLACK or WHITE
+# return 勝者 BLUE or RED
 func playout_random(next, x, y) -> int:		# 次を (x, y) に打ち、その後はランダム
 	var b2 = Board.new()
 	b2.copy_from(self)
 	if b2.put_col(x, y, next):
 		return next
 	while true:
-		next = (BLACK + WHITE) - next
+		next = (BLUE + RED) - next
 		var mv = b2.sel_move_random()
 		if b2.put_col(mv.x, mv.y, next):
 			return next
