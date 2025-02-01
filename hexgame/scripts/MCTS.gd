@@ -122,18 +122,19 @@ func do_search(iterations: int) -> Vector2:
 			node = node.select_child_ucb(c_puct, node.visits) # UCB で子ノードを選択
 			#if node.visits == 0: break		# 未評価ノードの場合
 			if bd.put_col(node.move.x, node.move.y, col):		# 終局
+				#node.wins += 1
 				go = true
 				break;
 			col = (Board.BLACK + Board.WHITE) - col
-		if go:
-			continue
-		# ノード展開（Expansion）
-		if node.visits != 0 && node.children.is_empty():
-			#var o_col = (Board.BLACK + Board.WHITE) - col
-			do_expand_node(node, bd)
-			node = node.children[node.children.size()/2]
-		# ロールアウト（Rollout）
-		var wcol = do_rollout(bd, node, col)
+		var wcol = col
+		if !go:
+			# ノード展開（Expansion）
+			##if node.visits != 0 && node.children.is_empty():
+			##	#var o_col = (Board.BLACK + Board.WHITE) - col
+			##	do_expand_node(node, bd)
+			##	node = node.children[node.children.size()/2]
+			# ロールアウト（Rollout）
+			wcol = do_rollout(bd, node, col)
 		#
 		do_backpropagate(node, col, wcol)
 	# 出来上がったツリーから最善手を求める

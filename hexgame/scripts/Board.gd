@@ -4,7 +4,7 @@ extends Node
 enum {
 	EMPTY = 0, BLACK, WHITE, BWALL, WWALL
 }
-const N_HORZ = 3
+const N_HORZ = 5
 const ARY_WIDTH = N_HORZ + 1
 const ARY_HEIGHT = N_HORZ + 2
 const ARY_SIZE = ARY_WIDTH * ARY_HEIGHT
@@ -33,9 +33,9 @@ func _init():
 	m_eval.resize(ARY_SIZE)
 	m_cells.fill(BWALL)			# 青壁 for 上下
 	init()
-	if false:
-		for y in range(2, N_HORZ-1, 2):
-			for x in range(2, N_HORZ-1, 2):
+	if true:
+		for y in range(1, N_HORZ-1, 2):
+			for x in range(1, N_HORZ-1, 2):
 				m_cells[xyToIndex(x, y)] = WHITE
 				m_next_id += 1
 		check_connected()
