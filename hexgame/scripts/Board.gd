@@ -34,18 +34,23 @@ func _init():
 	m_eval.resize(ARY_SIZE)
 	m_cells.fill(BWALL)			# 青壁 for 上下
 	init()
-	if false:
-		for y in range(2, N_HORZ-1, 2):
-			for x in range(2, N_HORZ-1, 2):
-				m_cells[xyToIndex(x, y)] = RED
-				m_next_id += 1
-		check_connected()
 func init():
 	m_gid.fill(0)
 	for y in range(N_HORZ):
 		m_cells[xyToIndex(-1, y)] = WWALL		# 赤壁 for 左右
 		for x in range(N_HORZ):
 			m_cells[xyToIndex(x, y)] = EMPTY
+	if false:
+		for y in range(1, N_HORZ-1, 2):
+			for x in range(1, N_HORZ-1, 2):
+				m_cells[xyToIndex(x, y)] = RED
+				m_next_id += 1
+	if true:
+		var lst = [[1, 1], [3, 3]]
+		for pos in lst:
+			m_cells[xyToIndex(pos[0], pos[1])] = RED
+			m_next_id += 1
+	check_connected()
 func copy_from(s):
 	m_next_id = s.m_next_id
 	m_cells = s.m_cells.duplicate()
@@ -336,6 +341,7 @@ func sel_move_MCTS(next):
 	var mv = mcts.do_search(1000)
 	win_rate = mcts.win_rate
 	mcts.print()
+	mcts.print_top_children()
 	return mv
 func _ready():
 	pass # Replace with function body.

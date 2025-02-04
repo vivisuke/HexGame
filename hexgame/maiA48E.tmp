@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=3 uid="uid://duyxx1tfe0tha"]
+[gd_scene load_steps=8 format=3 uid="uid://duyxx1tfe0tha"]
 
 [ext_resource type="Script" path="res://scripts/title_bar.gd" id="1_afdw8"]
 [ext_resource type="Script" path="res://scripts/main.gd" id="1_juyok"]
@@ -7,8 +7,6 @@
 [ext_resource type="Texture2D" uid="uid://b0jdxche8u0vl" path="res://images/arrow_forward_black.png" id="4_glth8"]
 [ext_resource type="Texture2D" uid="uid://r34j6o8f3wdo" path="res://images/replay_white.png" id="5_tn1pk"]
 [ext_resource type="Texture2D" uid="uid://mhbmmre6tj1j" path="res://images/arrow_forward_white.png" id="5_updk2"]
-[ext_resource type="Texture2D" uid="uid://11kceuruilfr" path="res://images/undo_black.png" id="6_ntxjs"]
-[ext_resource type="Texture2D" uid="uid://cmucf560oi0yb" path="res://images/undo_white.png" id="7_t1sq7"]
 
 [node name="Main" type="Node2D"]
 script = ExtResource("1_juyok")
@@ -65,16 +63,10 @@ layout_mode = 2
 texture_normal = ExtResource("4_2nvq1")
 texture_pressed = ExtResource("5_tn1pk")
 
-[node name="UndoButton" type="TextureButton" parent="HBC"]
-layout_mode = 2
-texture_normal = ExtResource("6_ntxjs")
-texture_pressed = ExtResource("7_t1sq7")
-
 [node name="NextButton" type="TextureButton" parent="HBC"]
 layout_mode = 2
 texture_normal = ExtResource("4_glth8")
 texture_pressed = ExtResource("5_updk2")
 
 [connection signal="pressed" from="HBC/RestartButton" to="." method="_on_restart_button_pressed"]
-[connection signal="pressed" from="HBC/UndoButton" to="." method="_on_undo_button_pressed"]
 [connection signal="pressed" from="HBC/NextButton" to="." method="_on_next_button_pressed"]

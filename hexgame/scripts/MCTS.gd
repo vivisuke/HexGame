@@ -18,15 +18,20 @@ class MCTSNode:
 		move = move_made
 		#self.board_state.put_col(move.x, move.y, col)
 		pass
+	func to_text(lvl):
+		var txt = " ".repeat(lvl*2)
+		txt += "(%d, %d):%d/%d"%[move.x, move.y, wins, visits]
+		if visits != 0:
+			txt += " = %.1f%%"%(wins*100.0/visits)
+		#print(txt)
+		return txt
 	func print(lvl):
 		if lvl != 0:
-			var txt = " ".repeat(lvl*2)
-			txt += "(%d, %d):%d/%d"%[move.x, move.y, wins, visits]
-			if visits != 0:
-				txt += " = %.1f%%"%(wins*100/visits)
-			print(txt)
+			#print_self(lvl)
+			print(to_text(lvl))
 		for node in children:
-			node.print(lvl+1)
+			if lvl < 3:
+				node.print(lvl+1)
 		pass
 	func select_child_ucb(c_puct: float, parent_visits: int) -> MCTSNode:
 		var best_child = null
@@ -53,7 +58,8 @@ var win_rate = 0.0		# 期待勝率
 #var opponent_color: int
 #var heuristic_calculator: HexHeuristicValueCalculator # ヒューリスティック計算クラス
 
-var c_puct = 1.5 # UCB の探索パラメータ (調整可能)
+#var c_puct = 1.5 # UCB の探索パラメータ (調整可能)
+var c_puct = 2.0 # UCB の探索パラメータ (調整可能)
 var rollout_depth_limit = 50 # ロールアウトの深さ制限 (無限ループ対策)
 
 func _init(board: Board, p_color: int):		# p_color: 次の手番色
@@ -87,6 +93,18 @@ func do_rollout(board : Board, node : MCTSNode):
 	#if x == 0 && y == 4:
 	#	print(node.move, "wcol = ", wcol)
 	return wcol
+func print_top_children():
+	#print("MCTSNode:")
+	#root_node.print(2)
+	var txt = ""
+	var y = 0
+	for node in root_node.children:
+		if node.move.y != y:
+			y = node.move.y
+			print(txt)
+			txt = ""
+		txt += node.to_text(0) + "\t"
+	print(txt)
 func print():
 	print("MCTSNode:")
 	root_node.print(0)

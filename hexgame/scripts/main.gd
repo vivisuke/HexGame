@@ -5,7 +5,7 @@ var next = Board.BLUE
 var game_over = false
 
 func _ready():
-	seed(1)
+	#seed(1)
 	bd = Board.new()
 	$BoardRect.bd = bd
 	#bd.put_black(0, 1)
@@ -82,10 +82,18 @@ func _input(event):
 
 func _on_next_button_pressed():
 	if game_over: return
+	var pos
+	if next == Board.BLUE:
+		#pos = bd.sel_move_random()
+		#pos = bd.sel_move_PMC(next)
+		pos = bd.sel_move_MCTS(next)
+	else:
+		#pos = bd.sel_move_PMC(next)
+		pos = bd.sel_move_MCTS(next)
 	#var pos = bd.sel_move_random()
 	#var pos = bd.sel_move_maxeval()
 	#var pos = bd.sel_move_PMC(next)
-	var pos = bd.sel_move_MCTS(next)
+	#var pos = bd.sel_move_MCTS(next)
 	$EvalLabel.text = "WR = %.1f%%" % (bd.win_rate*100)
 	#var mcts = MCTS.new(bd, Board.BLUE, Board.RED)
 	#mcts.add_children()
@@ -98,4 +106,8 @@ func _on_next_button_pressed():
 func _on_restart_button_pressed():
 	init_board()
 	$BoardRect.init()
+	pass # Replace with function body.
+
+
+func _on_undo_button_pressed():
 	pass # Replace with function body.
