@@ -55,6 +55,7 @@ var board : Board
 var board_size: int
 var player_color: int	# MCTSで探索するプレイヤーの色
 var win_rate = 0.0		# 期待勝率
+var policy = null		# 最善着手
 #var opponent_color: int
 #var heuristic_calculator: HexHeuristicValueCalculator # ヒューリスティック計算クラス
 
@@ -105,6 +106,21 @@ func print_top_children():
 			txt = ""
 		txt += node.to_text(0) + "\t"
 	print(txt)
+func policy_to_text(node):
+	var txt = "(%d, %d) " % [node.move.x, node.move.y]
+	if !node.children.is_empty():
+		var best = null
+		var mxv = -INF
+		for chn in node.children:
+			if chn.visits != 0 && float(chn.wins)/chn.visits > mxv:
+				mxv = float(chn.wins)/chn.visits
+				best = chn
+		if best != null:
+			txt += policy_to_text(best)
+	return txt
+func print_policy():
+	var txt = policy_to_text(policy)
+	print("%.1f%% "%(policy.wins*100.0/policy.visits), txt)
 func print():
 	print("MCTSNode:")
 	root_node.print(0)
@@ -163,13 +179,15 @@ func do_search(iterations: int) -> Vector2:
 		#
 		do_backpropagate(node, node.move.z, wcol)
 	# 出来上がったツリーから最善手を求める
+	policy = null
 	var mv = Vector2(-1, -1)
 	win_rate = -INF
 	for node in root_node.children:
 		if float(node.wins)/node.visits > win_rate:
 			win_rate = float(node.wins)/node.visits
-			mv.x = node.move.x
-			mv.y = node.move.y
+			policy = node
+	mv.x = policy.move.x
+	mv.y = policy.move.y
 	print("max w/v = %.1f%%"%(win_rate*100))
 	print("root_node.win/visits = %d/%d" % [root_node.wins, root_node.visits])
 	return mv

@@ -5,7 +5,7 @@ enum {
 	#EMPTY = 0, BLACK, WHITE, BWALL, WWALL
 	EMPTY = 0, BLUE, RED, BWALL, WWALL
 }
-const N_HORZ = 5
+const N_HORZ = 3
 const ARY_WIDTH = N_HORZ + 1
 const ARY_HEIGHT = N_HORZ + 2
 const ARY_SIZE = ARY_WIDTH * ARY_HEIGHT
@@ -45,7 +45,7 @@ func init():
 			for x in range(1, N_HORZ-1, 2):
 				m_cells[xyToIndex(x, y)] = RED
 				m_next_id += 1
-	if true:
+	if false:
 		var lst = [[1, 1], [3, 3]]
 		for pos in lst:
 			m_cells[xyToIndex(pos[0], pos[1])] = RED
@@ -340,8 +340,9 @@ func sel_move_MCTS(next):
 	#mcts.add_children()
 	var mv = mcts.do_search(1000)
 	win_rate = mcts.win_rate
-	mcts.print()
+	#mcts.print()
 	mcts.print_top_children()
+	mcts.print_policy()
 	return mv
 func _ready():
 	pass # Replace with function body.

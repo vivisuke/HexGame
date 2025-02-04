@@ -67,6 +67,16 @@
 0065 ◎ C 02/02 02/02 0.001│ToDo│do_expand()：直前に打った位置も可能着手になっている
 0066 ● C 02/05            │ToDo│一定時間経過で do_search() 打ち切り？
 0067 ◎ C 02/05 02/05 0.001│ToDo│Undo アイコン設置
-0068 ● C 02/05            │ToDo│
-0069 ● C 02/05            │ToDo│
-0070 ● C 02/05            │ToDo│
+0068 ● C 02/05            │ToDo│MCTS.do_search()：想定進行表示
+0069 ● C 02/05            │ToDo│MCTS.print_top_children()：非空欄もその旨表示
+0070 ◎ C 02/05 02/05 0.001│ToDo│MCTS.print_policy()
+0071 ● C 02/05            │ToDo│
+0072 ● C 02/05            │ToDo│
+0073 ● C 02/05            │ToDo│
+0074 ● C 02/05            │ToDo│
+0075 ● C 02/05            │ToDo│
+0076 ● C 02/05            │ToDo│
+0077 ● C 02/05            │ToDo│
+0078 ● C 02/05            │ToDo│
+0079 ● C 02/05            │ToDo│
+0080 ● C 02/05            │ToDo│
