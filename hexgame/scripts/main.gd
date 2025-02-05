@@ -122,5 +122,12 @@ func _on_undo_button_pressed():
 	for pos in move_hist:
 		bd.put_col(pos.x, pos.y, next)
 		next = (Board.BLUE + Board.RED) - next
+	var p = Vector2(-1, -1)
+	if !move_hist.is_empty():
+		var back = move_hist[move_hist.size() - 1]
+		p.x = back.x
+		p.y = back.y
+	$BoardRect.put_pos = p
+	$BoardRect.view_path = false
 	$BoardRect.queue_redraw()
 	pass # Replace with function body.
