@@ -108,9 +108,10 @@ func print_top_children():
 		txt += node.to_text(0) + "\t"
 	print(txt)
 func policy_to_text(node):
-	var txt = "●" if node.move.z == Board.BLUE else "◯"
+	#var txt = "●" if node.move.z == Board.BLUE else "◯"
+	var txt = "青" if node.move.z == Board.BLUE else "赤"
 	#var txt = "(%d, %d) " % [node.move.x, node.move.y]
-	txt += " %c%d(%d/%d), " % [node.move.x+0x61, node.move.y+1, node.wins, node.visits]
+	txt += "%c%d(%d/%d) " % [node.move.x+0x61, node.move.y+1, node.wins, node.visits]
 	if !node.children.is_empty():
 		var best = null
 		var mxv = -INF

@@ -1,0 +1,80 @@
+[gd_scene load_steps=10 format=3 uid="uid://duyxx1tfe0tha"]
+
+[ext_resource type="Script" path="res://scripts/title_bar.gd" id="1_afdw8"]
+[ext_resource type="Script" path="res://scripts/main.gd" id="1_juyok"]
+[ext_resource type="Script" path="res://scripts/board_rect.gd" id="3_gwnx1"]
+[ext_resource type="Texture2D" uid="uid://dlrvfm4c0nqlr" path="res://images/replay_black.png" id="4_2nvq1"]
+[ext_resource type="Texture2D" uid="uid://b0jdxche8u0vl" path="res://images/arrow_forward_black.png" id="4_glth8"]
+[ext_resource type="Texture2D" uid="uid://r34j6o8f3wdo" path="res://images/replay_white.png" id="5_tn1pk"]
+[ext_resource type="Texture2D" uid="uid://mhbmmre6tj1j" path="res://images/arrow_forward_white.png" id="5_updk2"]
+[ext_resource type="Texture2D" uid="uid://11kceuruilfr" path="res://images/undo_black.png" id="6_ntxjs"]
+[ext_resource type="Texture2D" uid="uid://cmucf560oi0yb" path="res://images/undo_white.png" id="7_t1sq7"]
+
+[node name="Main" type="Node2D"]
+script = ExtResource("1_juyok")
+
+[node name="BG" type="ColorRect" parent="."]
+offset_right = 500.0
+offset_bottom = 900.0
+color = Color(1, 1, 0.752941, 1)
+
+[node name="TitleBar" type="ColorRect" parent="."]
+offset_right = 500.0
+offset_bottom = 50.0
+color = Color(0.545098, 0.501961, 0, 1)
+script = ExtResource("1_afdw8")
+
+[node name="MessLabel" type="Label" parent="."]
+offset_left = 20.0
+offset_top = 63.0
+offset_right = 120.0
+offset_bottom = 100.0
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_font_sizes/font_size = 24
+text = "Message"
+vertical_alignment = 1
+
+[node name="EvalLabel" type="Label" parent="."]
+offset_left = 294.0
+offset_top = 63.0
+offset_right = 488.0
+offset_bottom = 100.0
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_font_sizes/font_size = 24
+text = "WR = N/A"
+horizontal_alignment = 2
+vertical_alignment = 1
+
+[node name="BoardRect" type="ColorRect" parent="."]
+offset_left = 20.0
+offset_top = 100.0
+offset_right = 480.0
+offset_bottom = 740.0
+color = Color(1, 1, 0.752941, 1)
+script = ExtResource("3_gwnx1")
+
+[node name="HBC" type="HBoxContainer" parent="."]
+offset_left = 20.0
+offset_top = 838.0
+offset_right = 480.0
+offset_bottom = 878.0
+alignment = 2
+
+[node name="RestartButton" type="TextureButton" parent="HBC"]
+layout_mode = 2
+texture_normal = ExtResource("4_2nvq1")
+texture_pressed = ExtResource("5_tn1pk")
+
+[node name="UndoButton" type="TextureButton" parent="HBC"]
+layout_mode = 2
+texture_normal = ExtResource("6_ntxjs")
+texture_pressed = ExtResource("7_t1sq7")
+
+[node name="NextButton" type="TextureButton" parent="HBC"]
+layout_mode = 2
+texture_normal = ExtResource("4_glth8")
+texture_pressed = ExtResource("5_updk2")
+
+[connection signal="pressed" from="HBC/RestartButton" to="." method="_on_restart_button_pressed"]
+[connection signal="pressed" from="HBC/UndoButton" to="." method="_on_undo_button_pressed"]
+[connection signal="pressed" from="HBC/NextButton" to="." method="_on_next_button_pressed"]

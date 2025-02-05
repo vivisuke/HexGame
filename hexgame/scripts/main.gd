@@ -3,11 +3,13 @@ extends Node2D
 var bd
 var next = Board.BLUE
 var game_over = false
+var move_hist : PackedVector3Array = []		# 着手履歴 for Undo、要素：(x, y, col)
 
 func _ready():
 	#seed(1)
 	bd = Board.new()
 	$BoardRect.bd = bd
+	init_board()
 	#bd.put_black(0, 1)
 	#bd.put_white(1, 0)
 	#bd.print()
@@ -34,6 +36,7 @@ func _ready():
 func init_board():
 	game_over = false
 	next = Board.BLUE
+	move_hist.clear()
 	bd.init()
 	$BoardRect.queue_redraw()
 func print_next():
@@ -45,6 +48,7 @@ func _process(delta):
 	pass
 
 func do_put(pos):
+	move_hist.push_back(Vector3(pos.x, pos.y, next))
 	$BoardRect.put_pos = pos
 	$BoardRect.queue_redraw()
 	if bd.put_col(pos.x, pos.y, next):
@@ -110,4 +114,13 @@ func _on_restart_button_pressed():
 
 
 func _on_undo_button_pressed():
+	if move_hist.is_empty(): return
+	game_over = false
+	next = Board.BLUE
+	bd.init()
+	move_hist.resize(move_hist.size() - 1)
+	for pos in move_hist:
+		bd.put_col(pos.x, pos.y, next)
+		next = (Board.BLUE + Board.RED) - next
+	$BoardRect.queue_redraw()
 	pass # Replace with function body.
