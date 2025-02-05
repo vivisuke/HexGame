@@ -20,7 +20,8 @@ class MCTSNode:
 		pass
 	func to_text(lvl):
 		var txt = " ".repeat(lvl*2)
-		txt += "(%d, %d):%d/%d"%[move.x, move.y, wins, visits]
+		#txt += "(%d, %d):%d/%d"%[move.x, move.y, wins, visits]
+		txt += "%c%d:%d/%d"%[move.x+0x61, move.y+1, wins, visits]
 		if visits != 0:
 			txt += " = %.1f%%"%(wins*100.0/visits)
 		#print(txt)
