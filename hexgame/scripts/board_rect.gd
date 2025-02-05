@@ -18,6 +18,9 @@ var view_path = false			# bd.m_dist != 0 部分強調
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	#print("CELL_WD = ", CELL_WD)
+	for i in range(Board.N_HORZ):
+		add_axis_label(xyToPos(i, -0.75), "%c"%(0x61+i))
+		add_axis_label(xyToPos(-0.5, i), "%d"%(i+1))
 	pass # Replace with function body.
 func init():
 	put_pos = Vector2(-1, -1)
@@ -33,6 +36,15 @@ func posToXY(pos : Vector2):
 	x = floor((x + CELL_WD/2.0)/CELL_WD)
 	y = floor((y + CELL_WD/2.0)/CELL_WD)
 	return Vector2(x, y)
+# 目盛り値ラベル設置
+func add_axis_label(pos, txt):
+	var lbl = Label.new()
+	lbl.add_theme_color_override("font_color", Color.BLACK)
+	lbl.add_theme_font_size_override("font_size", 36)
+	lbl.text = txt
+	lbl.position = pos + Vector2(-CELL_WD/10.0, 0)
+	add_child(lbl)
+	return lbl
 func draw_stone(x, y, b):
 	#var col = Color("#6060ff") if b else Color("pink")
 	var col = BLACK_COL if b else WHITE_COL
