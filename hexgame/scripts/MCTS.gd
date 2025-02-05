@@ -107,7 +107,8 @@ func print_top_children():
 		txt += node.to_text(0) + "\t"
 	print(txt)
 func policy_to_text(node):
-	var txt = "(%d, %d) " % [node.move.x, node.move.y]
+	#var txt = "(%d, %d) " % [node.move.x, node.move.y]
+	var txt = "%c%d " % [node.move.x+0x61, node.move.y+1]
 	if !node.children.is_empty():
 		var best = null
 		var mxv = -INF

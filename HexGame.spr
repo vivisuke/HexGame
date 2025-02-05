@@ -70,7 +70,7 @@
 0068 ● C 02/05            │ToDo│MCTS.do_search()：想定進行表示
 0069 ● C 02/05            │ToDo│MCTS.print_top_children()：非空欄もその旨表示
 0070 ◎ C 02/05 02/05 0.001│ToDo│MCTS.print_policy()
-0071 ● C 02/05            │ToDo│
+0071 ◎ C 02/05 02/05 0.001│ToDo│MCTS.print_policy()：着手位置を 英字数字 形式表示
 0072 ● C 02/05            │ToDo│
 0073 ● C 02/05            │ToDo│
 0074 ● C 02/05            │ToDo│
