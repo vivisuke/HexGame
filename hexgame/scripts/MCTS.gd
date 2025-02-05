@@ -109,7 +109,7 @@ func print_top_children():
 	print(txt)
 func policy_to_text(node):
 	#var txt = "(%d, %d) " % [node.move.x, node.move.y]
-	var txt = "%c%d " % [node.move.x+0x61, node.move.y+1]
+	var txt = "%c%d(%d/%d), " % [node.move.x+0x61, node.move.y+1, node.wins, node.visits]
 	if !node.children.is_empty():
 		var best = null
 		var mxv = -INF
@@ -121,8 +121,16 @@ func policy_to_text(node):
 			txt += policy_to_text(best)
 	return txt
 func print_policy():
+	var pcnt = policy.wins*100.0/policy.visits
 	var txt = policy_to_text(policy)
-	print("%.1f%% "%(policy.wins*100.0/policy.visits), txt)
+	print("Best: %.1f%% "%pcnt, txt)
+	for node in root_node.children:
+		if node.move != policy.move:
+			var pcnt2 = node.wins*100.0/node.visits
+			if pcnt - pcnt2 <= 5:
+				var txt2 = policy_to_text(node)
+				print("Other: %.1f%% "%pcnt2, txt2)
+
 func print():
 	print("MCTSNode:")
 	root_node.print(0)

@@ -19,8 +19,8 @@ var view_path = false			# bd.m_dist != 0 部分強調
 func _ready():
 	#print("CELL_WD = ", CELL_WD)
 	for i in range(Board.N_HORZ):
-		add_axis_label(xyToPos(i, -0.75), "%c"%(0x61+i))
-		add_axis_label(xyToPos(-0.5, i), "%d"%(i+1))
+		add_axis_label(xyToPos(i, -1.0), "%c"%(0x61+i))
+		add_axis_label(xyToPos(-0.75, i), "%d"%(i+1))
 	pass # Replace with function body.
 func init():
 	put_pos = Vector2(-1, -1)
