@@ -7,6 +7,7 @@ class MCTSNode:
 	var children = []	# 子ノード (MCTSNode の配列)
 	var visits = 0		# 訪問回数
 	var wins = 0		# 勝利回数 (ロールアウトで勝利した場合にカウント)
+	var streak = 0		# 連勝（ s < 0 for 連敗数？）
 	var prior_probability = 0.0		# 事前確率 (必要に応じて使用)
 	var move : Vector3i				# 親ノードからこのノードへの着手（x, y, col）
 	
@@ -112,6 +113,7 @@ func policy_to_text(node):
 	var txt = "青" if node.move.z == Board.BLUE else "赤"
 	#var txt = "(%d, %d) " % [node.move.x, node.move.y]
 	txt += "%c%d(%d/%d) " % [node.move.x+0x61, node.move.y+1, node.wins, node.visits]
+	#txt += "%c%d(%d/%d %d) " % [node.move.x+0x61, node.move.y+1, node.wins, node.visits, node.streak]
 	if !node.children.is_empty():
 		var best = null
 		var mxv = -INF
@@ -123,16 +125,25 @@ func policy_to_text(node):
 			txt += policy_to_text(best)
 	return txt
 func print_policy():
-	var pcnt = policy.wins*100.0/policy.visits
-	var txt = policy_to_text(policy)
 	print()
-	print("Best: %.1f%% "%pcnt, txt)
-	for node in root_node.children:
-		if node.move != policy.move:
-			var pcnt2 = node.wins*100.0/node.visits
-			if pcnt - pcnt2 <= 5:
-				var txt2 = policy_to_text(node)
-				print("Other: %.1f%% "%pcnt2, txt2)
+	if true:
+		var lst = []
+		for node in root_node.children:
+			lst.push_back([node.wins*100.0/node.visits, node])
+		lst.sort_custom(func(a, b): return a[0] > b[0])
+		for i in range(min(5, root_node.children.size())):
+			var txt = policy_to_text(lst[i][1])
+			print("%.1f%% "%lst[i][0], txt)
+	else:
+		var pcnt = policy.wins*100.0/policy.visits
+		var txt = policy_to_text(policy)
+		print("Best: %.1f%% "%pcnt, txt)
+		for node in root_node.children:
+			if node.move != policy.move:
+				var pcnt2 = node.wins*100.0/node.visits
+				if pcnt - pcnt2 <= 5:
+					var txt2 = policy_to_text(node)
+					print("Other: %.1f%% "%pcnt2, txt2)
 
 func print():
 	print("MCTSNode:")
