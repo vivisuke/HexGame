@@ -75,6 +75,15 @@ layout_mode = 2
 texture_normal = ExtResource("4_glth8")
 texture_pressed = ExtResource("5_updk2")
 
+[node name="PolicyLabel" type="Label" parent="."]
+offset_left = 20.0
+offset_top = 650.0
+offset_right = 488.0
+offset_bottom = 790.0
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_font_sizes/font_size = 16
+text = "policy"
+
 [connection signal="pressed" from="HBC/RestartButton" to="." method="_on_restart_button_pressed"]
 [connection signal="pressed" from="HBC/UndoButton" to="." method="_on_undo_button_pressed"]
 [connection signal="pressed" from="HBC/NextButton" to="." method="_on_next_button_pressed"]

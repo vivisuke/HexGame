@@ -58,6 +58,7 @@ var board_size: int
 var player_color: int	# MCTSで探索するプレイヤーの色
 var win_rate = 0.0		# 期待勝率
 var policy = null		# 最善着手
+var policy_text = ""	# 読み筋テキスト
 #var opponent_color: int
 #var heuristic_calculator: HexHeuristicValueCalculator # ヒューリスティック計算クラス
 
@@ -126,6 +127,7 @@ func policy_to_text(node):
 	return txt
 func print_policy():
 	print()
+	policy_text = ""
 	if true:
 		var lst = []
 		for node in root_node.children:
@@ -133,6 +135,8 @@ func print_policy():
 		lst.sort_custom(func(a, b): return a[0] > b[0])
 		for i in range(min(5, root_node.children.size())):
 			var txt = policy_to_text(lst[i][1])
+			policy_text += "%.1f%% %s"%[lst[i][0], txt]
+			policy_text += "\n"
 			print("%.1f%% "%lst[i][0], txt)
 	else:
 		var pcnt = policy.wins*100.0/policy.visits

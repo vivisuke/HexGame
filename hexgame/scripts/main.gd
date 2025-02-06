@@ -87,6 +87,7 @@ func _input(event):
 func _on_next_button_pressed():
 	if game_over: return
 	var pos
+	bd.policy_text = ""
 	if next == Board.BLUE:
 		#pos = bd.sel_move_random()
 		#pos = bd.sel_move_PMC(next)
@@ -102,6 +103,7 @@ func _on_next_button_pressed():
 	#var mcts = MCTS.new(bd, Board.BLUE, Board.RED)
 	#mcts.add_children()
 	#mcts.print()
+	$PolicyLabel.text = bd.policy_text
 	print("put pos = ", pos)
 	do_put(pos)
 	pass # Replace with function body.

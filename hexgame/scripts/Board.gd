@@ -24,6 +24,8 @@ var m_ter_lst : PackedByteArray		# 末端位置リスト
 var m_next_ter : PackedByteArray	# 次の末端位置リスト
 var m_eval : PackedInt32Array		# 各位置の着手価値
 
+var policy_text = ""
+
 func xyToIndex(x, y): return (y+1)*ARY_WIDTH + x
 
 func _init():
@@ -343,6 +345,7 @@ func sel_move_MCTS(next):
 	#mcts.print()
 	mcts.print_top_children()
 	mcts.print_policy()
+	policy_text = mcts.policy_text
 	return mv
 func _ready():
 	pass # Replace with function body.
