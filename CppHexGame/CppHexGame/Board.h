@@ -14,6 +14,11 @@ class Board
 {
 public:
 	Board(int wd = 11);
+
+	int		xyToIndex(int x, int y) const {
+		return (y+1)*m_ary_width + x;
+	}
+	void	print() const;
 public:
 	int		m_width;
 	int		m_ary_width;
