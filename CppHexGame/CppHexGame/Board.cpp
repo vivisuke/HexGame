@@ -32,3 +32,7 @@ void Board::print() const {
 		cout << endl;
 	}
 }
+void Board::put(int x, int y, uchar col) {
+	auto ix = xyToIndex(x, y);
+	m_cells[ix] = col;
+}

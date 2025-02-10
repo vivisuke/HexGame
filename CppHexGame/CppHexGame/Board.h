@@ -19,6 +19,7 @@ public:
 		return (y+1)*m_ary_width + x;
 	}
 	void	print() const;
+	void	put(int x, int y, uchar col);
 public:
 	int		m_width;
 	int		m_ary_width;
