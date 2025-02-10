@@ -5,7 +5,7 @@ enum {
 	#EMPTY = 0, BLACK, WHITE, BWALL, WWALL
 	EMPTY = 0, BLUE, RED, BWALL, WWALL
 }
-const N_HORZ = 3
+const N_HORZ = 5
 const ARY_WIDTH = N_HORZ + 1
 const ARY_HEIGHT = N_HORZ + 2
 const ARY_SIZE = ARY_WIDTH * ARY_HEIGHT
@@ -18,6 +18,7 @@ var m_next_id = 1
 var win_rate = 0.0
 var m_cells : PackedByteArray
 var m_gid : PackedByteArray	# 0 for 未探索 or 空欄、1以上 for 連結石群 id
+var m_gid_ex : PackedByteArray	# 0 for 未探索 or 空欄、1以上 for 連結石群 id
 var m_dist : PackedByteArray		# 0 for 未探索、1以上 for 距離+1
 var m_path : PackedByteArray		# 1以上：最短パス
 var m_ter_lst : PackedByteArray		# 末端位置リスト
@@ -27,10 +28,12 @@ var m_eval : PackedInt32Array		# 各位置の着手価値
 var policy_text = ""
 
 func xyToIndex(x, y): return (y+1)*ARY_WIDTH + x
+func ixToX(ix): return ix%ARY_WIDTH
 
 func _init():
 	m_cells.resize(ARY_SIZE)
 	m_gid.resize(ARY_SIZE)
+	m_gid_ex.resize(ARY_SIZE)
 	m_dist.resize(ARY_SIZE)
 	m_path.resize(ARY_SIZE)
 	m_eval.resize(ARY_SIZE)
@@ -38,6 +41,7 @@ func _init():
 	init()
 func init():
 	m_gid.fill(0)
+	m_gid_ex.fill(0)
 	for y in range(N_HORZ):
 		m_cells[xyToIndex(-1, y)] = WWALL		# 赤壁 for 左右
 		for x in range(N_HORZ):
@@ -72,6 +76,13 @@ func print_gid():
 		var txt = ""
 		for x in range(N_HORZ):
 			txt += "%3d"%m_gid[xyToIndex(x, y)]
+		print(txt)
+func print_gid_ex():
+	print("m_gid_ex[] = ")
+	for y in range(N_HORZ):
+		var txt = ""
+		for x in range(N_HORZ):
+			txt += "%3d"%m_gid_ex[xyToIndex(x, y)]
 		print(txt)
 func print_dist():
 	print("m_dist[] = ")
@@ -186,6 +197,61 @@ func check_connected():
 			if (col == BLUE || col == RED) && m_gid[ix] == 0:
 				id += 1
 				check_connected_sub(ix, col, id)
+func is_connected_to_right(ix):
+	var x = ixToX(ix)
+	if x == N_HORZ - 1:
+		return true
+	if x == N_HORZ - 2 && m_cells[ix-ARY_WIDTH+1] == EMPTY && m_cells[ix+1] == EMPTY:
+		return true
+	return false
+func BFS_ex(ix) -> bool:
+	if m_gid_ex[ix-ARY_WIDTH] == 0 && m_cells[ix-ARY_WIDTH] == RED:
+		m_gid_ex[ix-ARY_WIDTH] = 1
+		if is_connected_to_right(ix-ARY_WIDTH): return true
+		if BFS_ex(ix-ARY_WIDTH): return true
+	if m_gid_ex[ix-ARY_WIDTH+1] == 0 && m_cells[ix-ARY_WIDTH+1] == RED:
+		m_gid_ex[ix-ARY_WIDTH+1] = 1
+		if is_connected_to_right(ix-ARY_WIDTH+1): return true
+		if BFS_ex(ix-ARY_WIDTH+1): return true
+	if m_gid_ex[ix-1] == 0 && m_cells[ix-1] == RED:
+		m_gid_ex[ix-1] = 1
+		if is_connected_to_right(ix-1): return true
+		if BFS_ex(ix-1): return true
+	if m_gid_ex[ix+1] == 0 && m_cells[ix+1] == RED:
+		m_gid_ex[ix+1] = 1
+		if is_connected_to_right(ix+1): return true
+		if BFS_ex(ix+1): return true
+	if m_gid_ex[ix+ARY_WIDTH-1] == 0 && m_cells[ix+ARY_WIDTH-1] == RED:
+		m_gid_ex[ix+ARY_WIDTH-1] = 1
+		if is_connected_to_right(ix+ARY_WIDTH-1): return true
+		if BFS_ex(ix+ARY_WIDTH-1): return true
+	if m_gid_ex[ix+ARY_WIDTH] == 0 && m_cells[ix+ARY_WIDTH] == RED:
+		m_gid_ex[ix+ARY_WIDTH] = 1
+		if is_connected_to_right(ix+ARY_WIDTH): return true
+		if BFS_ex(ix+ARY_WIDTH): return true
+	#
+	if (m_cells[ix-ARY_WIDTH] == EMPTY && m_cells[ix-ARY_WIDTH+1] == EMPTY &&
+		m_gid_ex[ix-ARY_WIDTH*2+1] == 0 && m_cells[ix-ARY_WIDTH*2+1] == RED):
+			m_gid_ex[ix-ARY_WIDTH*2+1] = 1
+			if is_connected_to_right(ix-ARY_WIDTH*2+1): return true
+			if BFS_ex(ix-ARY_WIDTH*2+1): return true
+	return false
+func check_h_connected_ex() -> bool:	# 弱連結考慮 左右辺連結判定
+	m_gid_ex.fill(0)
+	var lst = []
+	for y in range(N_HORZ):
+		var ix = xyToIndex(0, y)
+		if m_cells[ix] == RED:
+			m_gid_ex[ix] = 1
+			lst.push_back(ix)
+	for y in range(N_HORZ):
+		var ix = xyToIndex(1, y)
+		if m_cells[ix] == RED && m_cells[ix-1] == EMPTY && m_cells[ix-ARY_WIDTH-1] == EMPTY:
+			m_gid_ex[ix] = 1
+			lst.push_back(ix)
+	for ix in lst:
+		if BFS_ex(ix): return true
+	return false
 func BFS_sub(dist, col):
 	#m_next_ter.clear()
 	m_next_ter = PackedByteArray()

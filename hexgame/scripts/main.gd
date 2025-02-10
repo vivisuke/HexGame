@@ -67,15 +67,18 @@ func do_put(pos):
 		$BoardRect.view_path = true
 	else:
 		#bd.print()
-		bd.BFS(pos.x, pos.y)
+		#bd.BFS(pos.x, pos.y)
 		#bd.print_dist()
+		bd.check_h_connected_ex()
+		bd.print_gid_ex()
 		next = (Board.BLUE + Board.RED) - next
 		print_next()
 		#bd.print_gid()
-		bd.eval_empty()
-		bd.print_eval()
+		#bd.eval_empty()
+		#bd.print_eval()
 func _input(event):
 	if event is InputEventMouseButton && event.is_pressed():
+		$PolicyLabel.text = ""
 		var pos = get_global_mouse_position() - $BoardRect.position
 		print("pos = ", pos)
 		var xy = $BoardRect.posToXY(pos)
@@ -112,6 +115,7 @@ func _on_next_button_pressed():
 func _on_restart_button_pressed():
 	init_board()
 	$BoardRect.init()
+	$PolicyLabel.text = ""
 	pass # Replace with function body.
 
 
@@ -132,4 +136,5 @@ func _on_undo_button_pressed():
 	$BoardRect.put_pos = p
 	$BoardRect.view_path = false
 	$BoardRect.queue_redraw()
+	$PolicyLabel.text = ""
 	pass # Replace with function body.
