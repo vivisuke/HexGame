@@ -23,6 +23,8 @@ public:
 	bool	put(int x, int y, uchar col);		//	return: I‹Ç‚µ‚½H
 	void	update_gid(int ix, uchar col);
 	void	update_gid_sub(int ix, int ix2);
+	bool	find_horz(uchar id, int y);
+	bool	find_vert(uchar id, int x);
 public:
 	int		m_width;
 	int		m_ary_width;

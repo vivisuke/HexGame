@@ -58,11 +58,30 @@ void Board::print_gid() const {
 	}
 	cout << endl;
 }
+bool Board::find_horz(uchar gid, int y) {
+	for(int x = 0; x != m_width; ++x) {
+		if( m_gid[xyToIndex(x, y)] == gid )
+			return true;
+	}
+	return false;
+}
+bool Board::find_vert(uchar gid, int x) {
+	for(int y = 0; y != m_width; ++y) {
+		if( m_gid[xyToIndex(x, y)] == gid )
+			return true;
+	}
+	return false;
+}
 bool Board::put(int x, int y, uchar col) {
 	auto ix = xyToIndex(x, y);
 	m_cells[ix] = col;
 	update_gid(ix, col);
-	return false;
+	auto gid = m_gid[ix];
+	if( col == BLACK ) {
+		return find_horz(gid, 0) && find_horz(gid, m_width-1);		//	上下辺と連結？
+	} else {
+		return find_vert(gid, 0) && find_vert(gid, m_width-1);		//	左右辺と連結？
+	}
 }
 void Board::update_gid_sub(int ix, int ix2) {
 	if( m_cells[ix2] != m_cells[ix] ) return;
