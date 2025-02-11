@@ -1,19 +1,25 @@
 #include <iostream>
 #include <string>
+#include <random>
 #include "Board.h"
 
 using namespace std;
 
+std::mt19937 rgen(std::random_device{}()); // ÉVÅ[ÉhÇê›íË
+
 Board::Board(int wd)
 	: m_width(wd)
-	, m_seq_gid(0)
 {
 	m_ary_width = m_width + 1;
 	m_ary_height = m_width + 2;
 	m_ary_size = m_ary_width * m_ary_height;
 	m_cells.resize(m_ary_size);
-	for(auto &v : m_cells) v = EMPTY;
 	m_gid.resize(m_ary_size);
+	init();
+}
+void Board::init() {
+	m_seq_gid = 0;
+	for(auto &v : m_cells) v = EMPTY;
 	for(auto &v : m_gid) v = 0;
 }
 const char *wstr[] = {"ÇÅ", "ÇÇ", "ÇÉ", "ÇÑ", "ÇÖ", "ÇÜ", "Çá", "Çà", "Çâ", "Çä", "Çã"};
@@ -74,6 +80,9 @@ bool Board::find_vert(uchar gid, int x) {
 }
 bool Board::put(int x, int y, uchar col) {
 	auto ix = xyToIndex(x, y);
+	return put(ix, col);
+}
+bool Board::put(int ix, uchar col) {
 	m_cells[ix] = col;
 	update_gid(ix, col);
 	auto gid = m_gid[ix];
@@ -105,5 +114,25 @@ void Board::update_gid(int ix, uchar col) {
 	update_gid_sub(ix, ix+m_ary_width);
 	if( m_gid[ix] == 0 ) {
 		m_gid[ix] = ++m_seq_gid;
+	}
+}
+int Board::sel_move_random() const {
+	vector<int> lst;
+	for(int y = 0; y != m_width; ++y) {
+		for(int x = 0; x != m_width; ++x) {
+			auto ix = xyToIndex(x, y);
+			if( m_cells[ix] == EMPTY )
+				lst.push_back(ix);
+		}
+	}
+	if( lst.empty() ) return 0;
+	return lst[rgen() % lst.size()];
+}
+uchar Board::rollout(int ix, uchar col) {
+	if( put(ix, col) ) return col;
+	for(;;) {
+		col = (BLACK + WHITE) - col;
+		ix = sel_move_random();
+		if( put(ix, col) ) return col;
 	}
 }
