@@ -20,7 +20,9 @@ public:
 	}
 	void	print() const;
 	void	print_gid() const;
-	void	put(int x, int y, uchar col);
+	bool	put(int x, int y, uchar col);		//	return: I‹Ç‚µ‚½H
+	void	update_gid(int ix, uchar col);
+	void	update_gid_sub(int ix, int ix2);
 public:
 	int		m_width;
 	int		m_ary_width;

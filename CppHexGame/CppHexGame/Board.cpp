@@ -58,7 +58,33 @@ void Board::print_gid() const {
 	}
 	cout << endl;
 }
-void Board::put(int x, int y, uchar col) {
+bool Board::put(int x, int y, uchar col) {
 	auto ix = xyToIndex(x, y);
 	m_cells[ix] = col;
+	update_gid(ix, col);
+	return false;
+}
+void Board::update_gid_sub(int ix, int ix2) {
+	if( m_cells[ix2] != m_cells[ix] ) return;
+	if (m_gid[ix] == 0)		// 最初の連結の場合
+		m_gid[ix] = m_gid[ix2];
+	else if( m_gid[ix] != m_gid[ix2] ) {		// グループid のマージが必要
+		auto o = m_gid[ix2];
+		auto n = m_gid[ix];
+		for(auto i = xyToIndex(0, 0); i <= xyToIndex(m_width-1, m_width-1); ++i) {
+			if (m_gid[i] == o)
+				m_gid[i] = n;
+		}
+	}
+}
+void Board::update_gid(int ix, uchar col) {
+	update_gid_sub(ix, ix-m_ary_width);
+	update_gid_sub(ix, ix-m_ary_width+1);
+	update_gid_sub(ix, ix-1);
+	update_gid_sub(ix, ix+1);
+	update_gid_sub(ix, ix+m_ary_width-1);
+	update_gid_sub(ix, ix+m_ary_width);
+	if( m_gid[ix] == 0 ) {
+		m_gid[ix] = ++m_seq_gid;
+	}
 }
