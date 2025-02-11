@@ -19,12 +19,15 @@ public:
 		return (y+1)*m_ary_width + x;
 	}
 	void	print() const;
+	void	print_gid() const;
 	void	put(int x, int y, uchar col);
 public:
 	int		m_width;
 	int		m_ary_width;
 	int		m_ary_height;
 	int		m_ary_size;
+	uchar	m_seq_gid;
 	std::vector<uchar> m_cells;
+	std::vector<uchar> m_gid;
 };
 

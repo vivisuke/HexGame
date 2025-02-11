@@ -89,4 +89,14 @@
 0087 ◎ C 02/11 02/11 0.001│ToDo│Board::print()
 0088 ◎ C 02/11 02/11 0.001│ToDo│Board::put(x, y, col)
 0089 ◎ C 02/11 02/11 0.001│ToDo│Board::print()：全角表示
-0090 ● C 02/11            │ToDo│
+0090 ◎ C 02/11 02/11 0.001│ToDo│Board::m_gid : vector<uchar> 追加
+0091 ◎ C 02/11 02/11 0.001│ToDo│Board::print_gid()
+0092 ● C 02/11            │ToDo│
+0093 ● C 02/11            │ToDo│
+0094 ● C 02/11            │ToDo│
+0095 ● C 02/11            │ToDo│
+0096 ● C 02/11            │ToDo│
+0097 ● C 02/11            │ToDo│
+0098 ● C 02/11            │ToDo│
+0099 ● C 02/11            │ToDo│
+0100 ● C 02/11            │ToDo│

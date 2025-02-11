@@ -6,12 +6,15 @@ using namespace std;
 
 Board::Board(int wd)
 	: m_width(wd)
+	, m_seq_gid(0)
 {
 	m_ary_width = m_width + 1;
 	m_ary_height = m_width + 2;
 	m_ary_size = m_ary_width * m_ary_height;
 	m_cells.resize(m_ary_size);
 	for(auto &v : m_cells) v = EMPTY;
+	m_gid.resize(m_ary_size);
+	for(auto &v : m_gid) v = 0;
 }
 const char *wstr[] = {"ÇÅ", "ÇÇ", "ÇÉ", "ÇÑ", "ÇÖ", "ÇÜ", "Çá", "Çà", "Çâ", "Çä", "Çã"};
 void Board::print() const {
@@ -43,6 +46,17 @@ void Board::print() const {
 		}
 		cout << endl;
 	}
+	cout << endl;
+}
+void Board::print_gid() const {
+	for(int y = 0; y != m_width; ++y) {
+		for(int x = 0; x != m_width; ++x) {
+			auto ix = xyToIndex(x, y);
+			cout << (int)m_gid[ix] << " ";
+		}
+		cout << endl;
+	}
+	cout << endl;
 }
 void Board::put(int x, int y, uchar col) {
 	auto ix = xyToIndex(x, y);
