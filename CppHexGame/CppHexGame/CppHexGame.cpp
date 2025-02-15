@@ -27,22 +27,36 @@ int main()
 		bd.print();
 		bd.print_gid();
 	}
-	const int NR = 1000;
-	for(int y = 0; y != bd.m_width; ++y) {
-		for(int x = 0; x != bd.m_width; ++x) {
-			auto ix = bd.xyToIndex(x, y);
-			int wcnt = 0;
-			for(int i = 0; i != NR; ++i) {
-				bd.init();
-				auto won = bd.rollout(ix, BLACK);
-				if( won == BLACK )
-					++wcnt;
+	if( false ) {
+		const int NR = 10000;
+		for(int y = 0; y != bd.m_width; ++y) {
+			for(int x = 0; x != bd.m_width; ++x) {
+				auto ix = bd.xyToIndex(x, y);
+				int wcnt = 0;
+				for(int i = 0; i != NR; ++i) {
+					bd.init();
+					auto won = bd.rollout(ix, BLACK);
+					if( won == BLACK )
+						++wcnt;
+				}
+				printf("%.1f%% ", wcnt*100.0/NR);
 			}
-			printf("%.1f%% ", wcnt*100.0/NR);
+			printf("\n");
 		}
 		printf("\n");
 	}
-	printf("\n");
+	if( true ) {
+		bd.saveStatePut(1, 0, BLACK);
+		bd.saveStatePut(1, 2, BLACK);
+		bd.print();
+		bd.print_gid();
+		bd.saveStatePut(1, 1, BLACK);
+		bd.print();
+		bd.print_gid();
+		bd.undo(1, 1);
+		bd.print();
+		bd.print_gid();
+	}
 
 	//
     std::cout << "\nOK.\n";

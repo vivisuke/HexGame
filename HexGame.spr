@@ -96,7 +96,7 @@
 0094 ◎ C 02/11 02/11 0.001│ToDo│Board::init()
 0095 ◎ C 02/11 02/11 0.001│ToDo│Board::rollout(x, y, col)
 0096 ◎ C 02/11 02/11 0.001│ToDo│Board::sel_move_random() : int
-0097 ● C 02/11            │ToDo│
-0098 ● C 02/11            │ToDo│
-0099 ● C 02/11            │ToDo│
-0100 ● C 02/11            │ToDo│
+0097 ● C 02/12            │ToDo│MCTS (UCB) 実装
+0098 ◎ C 02/15 02/15 0.001│ToDo│Undo 可能 put() 実装
+0099 ● C 02/15            │ToDo│
+0100 ● C 02/15            │ToDo│

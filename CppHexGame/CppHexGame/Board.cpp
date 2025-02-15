@@ -1,5 +1,6 @@
 #include <iostream>
 #include <string>
+#include <math.h>
 #include <random>
 #include "Board.h"
 
@@ -7,6 +8,62 @@ using namespace std;
 
 std::mt19937 rgen(std::random_device{}()); // シードを設定
 
+//--------------------------------------------------------------------------------
+double MCTSNode::calculate_ucb(double c_puct) const {
+	//if( m_visits == 0 )
+	//	return INT_MAX;
+	auto t1 = (double)m_wins / m_visits;		//	勝率
+	auto t2 = c_puct * sqrt(log(m_parent->m_visits) / (double)m_visits);	// 探索
+	return t1 + t2;
+}
+MCTSNode* MCTSNode::select_child_ucb(double c_puct) {
+	MCTSNode *best = nullptr;
+	double max_ucb = -INT_MAX;
+	for(auto i = 0; i != m_children.size(); ++i) {
+		auto *node = &m_children[i];
+		auto ucb = node->calculate_ucb(c_puct);
+		if( node->m_visits == 0 )
+			return node;
+		if( ucb > max_ucb ) {
+			max_ucb = ucb;
+			best = node;
+		}
+	}
+	return best;
+}
+//--------------------------------------------------------------------------------
+MCTS::MCTS(const Board* board, uchar col)
+	: m_board(board), m_col(col)
+{
+	//m_root = new MCTSNode();
+}
+void MCTS::do_expand(MCTSNode* node) {
+	auto n = m_board->n_empty();
+	node->m_children.resize(n);
+	int i = 0;		//	子ノードインデックス
+	uchar col = (BLACK + WHITE) - node->m_col;
+	const auto ix9 = m_board->xyToIndex(m_board->m_width - 1, m_board->m_width - 1);
+	for(auto ix = m_board->xyToIndex(0, 0); ix <= ix9; ++ix) {
+		if(m_board->m_cells[ix] == EMPTY ) {
+			auto &ch = node->m_children[i++];
+			ch.m_ix = ix;
+			ch.m_col = col;
+			ch.m_wins = ch.m_visits = 0;
+			ch.m_parent = node;
+			ch.m_children.clear();
+		}
+	}
+}
+void MCTS::do_search(int itr) {
+	for(int i = 0; i != itr; ++i) {
+		Board bd(m_board->m_width);
+		bd.copy_from(*m_board);
+		auto *node = &m_root;
+		while( !node->m_children.empty() ) {
+		}
+	}
+}
+//--------------------------------------------------------------------------------
 Board::Board(int wd)
 	: m_width(wd)
 {
@@ -14,13 +71,34 @@ Board::Board(int wd)
 	m_ary_height = m_width + 2;
 	m_ary_size = m_ary_width * m_ary_height;
 	m_cells.resize(m_ary_size);
+	for(auto &v : m_cells) v = BWALL;
 	m_gid.resize(m_ary_size);
+	m_gid_stack.reserve(1000*1000);
 	init();
 }
 void Board::init() {
 	m_seq_gid = 0;
-	for(auto &v : m_cells) v = EMPTY;
+	//for(auto &v : m_cells) v = EMPTY;
+	for(int y = 0; y != m_width; ++y) {
+		auto ix = xyToIndex(0, y);
+		m_cells[ix-1] = WWALL;
+		m_cells[ix+m_width] = WWALL;
+		for(int x = 0; x != m_width; ++x) {
+			auto ix = xyToIndex(x, y);
+			m_cells[ix] = EMPTY;
+		}
+	}
 	for(auto &v : m_gid) v = 0;
+}
+void Board::copy_from(const Board &src) {
+	*this = src;
+}
+int Board::n_empty() const {
+	int cnt = 0;
+	for(auto ix = xyToIndex(0, 0); ix <= xyToIndex(m_width-1, m_width-1); ++ix)
+		if( m_cells[ix] == 0 )
+			++cnt;
+	return cnt;
 }
 const char *wstr[] = {"ａ", "ｂ", "ｃ", "ｄ", "ｅ", "ｆ", "ｇ", "ｈ", "ｉ", "ｊ", "ｋ"};
 void Board::print() const {
@@ -90,6 +168,29 @@ bool Board::put(int ix, uchar col) {
 		return find_horz(gid, 0) && find_horz(gid, m_width-1);		//	上下辺と連結？
 	} else {
 		return find_vert(gid, 0) && find_vert(gid, m_width-1);		//	左右辺と連結？
+	}
+}
+void Board::saveState() {
+	int ix = xyToIndex(0, 0);
+	int ix9 = xyToIndex(m_width-1, m_width-1);
+	for(; ix <= ix9; ++ix) {
+		if( m_cells[ix] < BWALL )
+			m_gid_stack.push_back(m_gid[ix]);
+	}
+}
+bool Board::saveStatePut(int ix, uchar col) {
+	saveState();
+	return put(ix, col);
+}
+void Board::undo(int ix) {
+	m_cells[ix] = EMPTY;
+	int ix0 = xyToIndex(0, 0);
+	int i = xyToIndex(m_width-1, m_width-1);
+	for (; i >= ix0; --i ) {
+		if( m_cells[i] < BWALL ) {
+			m_gid[i] = m_gid_stack[m_gid_stack.size() - 1];
+			m_gid_stack.pop_back();
+		}
 	}
 }
 void Board::update_gid_sub(int ix, int ix2) {
