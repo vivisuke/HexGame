@@ -67,13 +67,14 @@ void MCTS::do_search(int itr) {
 Board::Board(int wd)
 	: m_width(wd)
 {
-	m_ary_width = m_width + 1;
+	m_ary_width = m_width + 2;
 	m_ary_height = m_width + 2;
 	m_ary_size = m_ary_width * m_ary_height;
 	m_cells.resize(m_ary_size);
 	for(auto &v : m_cells) v = BWALL;
 	m_gid.resize(m_ary_size);
 	m_gid_stack.reserve(1000*1000);
+	m_n_node = 0;
 	init();
 }
 void Board::init() {
@@ -112,6 +113,7 @@ void Board::print() const {
 
 	for(int y = 0; y != m_width; ++y) {
 		//cout << y+1 << " ";
+		cout << string(y, ' ');
 		printf("%2d", y+1);
 		for(int x = 0; x != m_width; ++x) {
 			auto ix = xyToIndex(x, y);
@@ -134,6 +136,7 @@ void Board::print() const {
 }
 void Board::print_gid() const {
 	for(int y = 0; y != m_width; ++y) {
+		cout << string(y, ' ');
 		for(int x = 0; x != m_width; ++x) {
 			auto ix = xyToIndex(x, y);
 			cout << (int)m_gid[ix] << " ";
@@ -141,6 +144,14 @@ void Board::print_gid() const {
 		cout << endl;
 	}
 	cout << endl;
+}
+void Board::print_put_stack() const {
+	for(auto ix : m_put_stack) {
+		int x = ixToX(ix);
+		int y = ixToY(ix);
+		printf("%c%d ", (0x61+x), y+1);
+	}
+	printf("\n");
 }
 bool Board::find_horz(uchar gid, int y) {
 	for(int x = 0; x != m_width; ++x) {
@@ -161,6 +172,7 @@ bool Board::put(int x, int y, uchar col) {
 	return put(ix, col);
 }
 bool Board::put(int ix, uchar col) {
+	m_put_stack.push_back(ix);
 	m_cells[ix] = col;
 	update_gid(ix, col);
 	auto gid = m_gid[ix];
@@ -171,6 +183,7 @@ bool Board::put(int ix, uchar col) {
 	}
 }
 void Board::saveState() {
+	m_seq_stack.push_back(m_seq_gid);
 	int ix = xyToIndex(0, 0);
 	int ix9 = xyToIndex(m_width-1, m_width-1);
 	for(; ix <= ix9; ++ix) {
@@ -183,6 +196,9 @@ bool Board::saveStatePut(int ix, uchar col) {
 	return put(ix, col);
 }
 void Board::undo(int ix) {
+	m_seq_gid = m_seq_stack.back();
+	m_seq_stack.pop_back();
+	m_put_stack.pop_back();
 	m_cells[ix] = EMPTY;
 	int ix0 = xyToIndex(0, 0);
 	int i = xyToIndex(m_width-1, m_width-1);
@@ -236,4 +252,128 @@ uchar Board::rollout(int ix, uchar col) {
 		ix = sel_move_random();
 		if( put(ix, col) ) return col;
 	}
+}
+int Board::min_level(int alpha, int beta, int n_empty) {
+	--n_empty;
+	int ix = xyToIndex(0, 0);
+	int ix9 = xyToIndex(m_width-1, m_width-1);
+	for(; ix <= ix9; ++ix) {
+		if( m_cells[ix] == EMPTY ) {
+			if( saveStatePut(ix, WHITE) ) {	//	put() → 終局の場合
+				++m_n_node;
+				undo(ix);
+				return -(1 + n_empty);
+			}
+			beta = min(beta, max_level(alpha, beta, n_empty));
+			undo(ix);
+			if( alpha >= beta )
+				break;
+		}
+	}
+	return beta;
+}
+int Board::max_level(int alpha, int beta, int n_empty) {
+	--n_empty;
+	int ix = xyToIndex(0, 0);
+	int ix9 = xyToIndex(m_width-1, m_width-1);
+	for(; ix <= ix9; ++ix) {
+		if( m_cells[ix] == EMPTY ) {
+			if( saveStatePut(ix, BLACK) ) {	//	put() → 終局の場合
+				++m_n_node;
+				undo(ix);
+				return (1 + n_empty);
+			}
+			alpha = max(alpha, min_level(alpha, beta, n_empty));
+			undo(ix);
+			if( alpha >= beta )
+				break;
+		}
+	}
+	return alpha;
+}
+int Board::min_level(int n_empty) {
+	--n_empty;
+	int ix = xyToIndex(0, 0);
+	int ix9 = xyToIndex(m_width-1, m_width-1);
+	int best_ev = INT_MAX;
+	for(; ix <= ix9; ++ix) {
+		if( m_cells[ix] == EMPTY ) {
+			if( saveStatePut(ix, WHITE) ) {	//	put() → 終局の場合
+				++m_n_node;
+				//print_put_stack();
+				undo(ix);
+				return -(1 + n_empty);
+			}
+			auto ev = max_level(n_empty);
+			if( ev < best_ev )
+				best_ev = ev;
+			undo(ix);
+		}
+	}
+	//if( n_empty >= 7 ) {
+	//	print();
+	//	cout << "best_ev = " << best_ev << endl;
+	//}
+	return best_ev;
+}
+int Board::max_level(int n_empty) {
+	--n_empty;
+	int ix = xyToIndex(0, 0);
+	int ix9 = xyToIndex(m_width-1, m_width-1);
+	int best_ev = -INT_MAX;
+	for(; ix <= ix9; ++ix) {
+		if( m_cells[ix] == EMPTY ) {
+			if( saveStatePut(ix, BLACK) ) {	//	put() → 終局の場合
+				++m_n_node;
+				//print_put_stack();
+				undo(ix);
+				return 1 + n_empty;
+			}
+			auto ev = min_level(n_empty);
+			if( ev > best_ev )
+				best_ev = ev;
+			undo(ix);
+		}
+	}
+	//if( n_empty >= 7 ) {
+	//	print();
+	//	cout << "best_ev = " << best_ev << endl;
+	//}
+	return best_ev;
+}
+int Board::min_max(uchar col, int n_empty) {
+	--n_empty;
+	int ix = xyToIndex(0, 0);
+	int ix9 = xyToIndex(m_width-1, m_width-1);
+	int best_ev = 0;
+	if( col == BLACK ) {
+		best_ev = -INT_MAX;
+		for(; ix <= ix9; ++ix) {
+			if( m_cells[ix] == EMPTY ) {
+				if( saveStatePut(ix, col) ) {	//	put() → 終局の場合
+					undo(ix);
+					return 1 + n_empty;
+				}
+				auto ev = min_max(WHITE, n_empty);
+				undo(ix);
+				if( ev > best_ev )
+					best_ev = ev;
+			}
+		}
+	} else {	//	白番
+		best_ev = INT_MAX;
+		for(; ix <= ix9; ++ix) {
+			if( m_cells[ix] == EMPTY ) {
+				if( saveStatePut(ix, col) ) {	//	put() → 終局の場合
+					undo(ix);
+					return -(1 + n_empty);
+				}
+				auto ev = min_max(BLACK, n_empty);
+				undo(ix);
+				if( ev < best_ev )
+					best_ev = ev;
+			}
+		}
+	}
+	return best_ev;
 }

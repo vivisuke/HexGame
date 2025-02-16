@@ -45,7 +45,7 @@ int main()
 		}
 		printf("\n");
 	}
-	if( true ) {
+	if( false ) {
 		bd.saveStatePut(1, 0, BLACK);
 		bd.saveStatePut(1, 2, BLACK);
 		bd.print();
@@ -54,6 +54,163 @@ int main()
 		bd.print();
 		bd.print_gid();
 		bd.undo(1, 1);
+		bd.print();
+		bd.print_gid();
+	}
+	if( true ) {
+		Board bd(3);
+		bd.print();
+		int n_empty = bd.m_width * bd.m_width - 1;
+		for(int y = 0; y != bd.m_width; ++y) {
+			cout << string(y*2, ' ');
+			for(int x = 0; x != bd.m_width; ++x) {
+				auto ix = bd.xyToIndex(x, y);
+				if( bd.m_cells[ix] == EMPTY ) {
+					bd.saveStatePut(ix, BLACK);
+					int ev = bd.min_level(n_empty);
+					printf("%4d", ev);
+					bd.undo(ix);
+				} else
+					printf("  NA");
+			}
+			printf("\n");
+		}
+		printf("\n");
+		cout << "n node = " << bd.m_n_node << endl;
+		//bd.print_gid();
+	}
+	if( false ) {
+		Board bd(4);
+		int n_empty = bd.m_width * bd.m_width - 1;
+		for(int y = 0; y != bd.m_width; ++y) {
+			for(int x = 0; x != bd.m_width; ++x) {
+				auto ix = bd.xyToIndex(x, y);
+				if( bd.m_cells[ix] == EMPTY ) {
+					bd.saveStatePut(ix, BLACK);
+					int ev = bd.min_level(-INT_MAX, INT_MAX, n_empty);
+					printf("%4d", ev);
+					bd.undo(ix);
+				} else
+					printf("  NA");
+			}
+			printf("\n");
+		}
+		printf("\n");
+		cout << "n node = " << bd.m_n_node << endl;
+		bd.print();
+		bd.print_gid();
+	}
+	if( true ) {
+		Board bd(4);
+		bd.saveStatePut(1, 2, BLACK);
+		bd.saveStatePut(2, 0, WHITE);
+		bd.print();
+		int n_empty = bd.m_width * bd.m_width - 3;
+		for(int y = 0; y != bd.m_width; ++y) {
+			cout << string(y*2, ' ');
+			for(int x = 0; x != bd.m_width; ++x) {
+				auto ix = bd.xyToIndex(x, y);
+				if( bd.m_cells[ix] == EMPTY ) {
+					bd.saveStatePut(ix, WHITE);
+					int ev = bd.max_level(-INT_MAX, INT_MAX, n_empty);
+					printf("%4d", ev);
+					bd.undo(ix);
+				} else
+					printf("  NA");
+			}
+			printf("\n");
+		}
+		printf("\n");
+		//printf("n node = %d\n", bd.m_n_node);
+		cout << "n node = " << bd.m_n_node << endl;
+		//bd.print_gid();
+	}
+	if( false ) {
+		Board bd(3);
+		bd.saveStatePut(0, 0, BLACK);
+		int n_empty = bd.m_width * bd.m_width - 2;
+		for(int y = 0; y != bd.m_width; ++y) {
+			for(int x = 0; x != bd.m_width; ++x) {
+				auto ix = bd.xyToIndex(x, y);
+				if( bd.m_cells[ix] == EMPTY ) {
+					bd.saveStatePut(ix, WHITE);
+					int ev = bd.max_level(n_empty);
+					printf("%4d", ev);
+					bd.undo(ix);
+				} else
+					printf("  NA");
+			}
+			printf("\n");
+		}
+		printf("\n");
+		bd.print();
+		bd.print_gid();
+	}
+	if( false ) {
+		Board bd(3);
+		bd.saveStatePut(0, 0, BLACK);
+		bd.saveStatePut(1, 1, WHITE);
+		int n_empty = bd.m_width * bd.m_width - 3;
+		for(int y = 0; y != bd.m_width; ++y) {
+			for(int x = 0; x != bd.m_width; ++x) {
+				auto ix = bd.xyToIndex(x, y);
+				if( bd.m_cells[ix] == EMPTY ) {
+					bd.saveStatePut(ix, BLACK);
+					int ev = bd.min_level(n_empty);
+					printf("%4d", ev);
+					bd.undo(ix);
+				} else
+					printf("  NA");
+			}
+			printf("\n");
+		}
+		printf("\n");
+		bd.print();
+		bd.print_gid();
+	}
+	if( false ) {
+		Board bd(3);
+		bd.saveStatePut(0, 0, BLACK);
+		bd.saveStatePut(1, 1, WHITE);
+		bd.saveStatePut(1, 0, BLACK);
+		int n_empty = bd.m_width * bd.m_width - 4;
+		for(int y = 0; y != bd.m_width; ++y) {
+			for(int x = 0; x != bd.m_width; ++x) {
+				auto ix = bd.xyToIndex(x, y);
+				if( bd.m_cells[ix] == EMPTY ) {
+					bd.saveStatePut(ix, WHITE);
+					int ev = bd.max_level(n_empty);
+					printf("%4d", ev);
+					bd.undo(ix);
+				} else
+					printf("  NA");
+			}
+			printf("\n");
+		}
+		printf("\n");
+		bd.print();
+		bd.print_gid();
+	}
+	if( false ) {
+		Board bd(3);
+		bd.saveStatePut(0, 0, BLACK);
+		//bd.saveStatePut(1, 1, WHITE);
+		int n_empty = bd.m_width * bd.m_width - 1;
+		uchar next = WHITE;
+		for(int y = 0; y != bd.m_width; ++y) {
+			for(int x = 0; x != bd.m_width; ++x) {
+				auto ix = bd.xyToIndex(x, y);
+				if( bd.m_cells[ix] == EMPTY ) {
+					bd.saveStatePut(ix, next);
+					int ev = bd.min_max(BLACK+WHITE-next, n_empty - 1);
+					printf("%3d ", ev);
+					bd.undo(ix);
+				} else
+					printf("  NA");
+			}
+			printf("\n");
+		}
+		printf("\n");
 		bd.print();
 		bd.print_gid();
 	}

@@ -54,9 +54,12 @@ public:
 	int		xyToIndex(int x, int y) const {
 		return (y+1)*m_ary_width + x;
 	}
+	int		ixToX(int ix ) const { return ix % m_ary_width; }
+	int		ixToY(int ix ) const { return ix / m_ary_width - 1; }
 	int		n_empty() const;
 	void	print() const;
 	void	print_gid() const;
+	void	print_put_stack() const;
 	void	copy_from(const Board&);
 	bool	put(int x, int y, uchar col);		//	return: 終局した？
 	bool	put(int ix, uchar col);				//	return: 終局した？
@@ -71,14 +74,22 @@ public:
 	bool	find_vert(uchar id, int x);
 	int		sel_move_random() const;
 	uchar	rollout(int ix, uchar col);
+	int		min_max(uchar col, int n_empty);	//	黒から見た評価値を返す（(勝：+1, 負：-1) ±空欄数）
+	int		min_level(int n_empty);				//	黒から見た評価値を返す（(勝：+1, 負：-1) ±空欄数）
+	int		max_level(int n_empty);				//	黒から見た評価値を返す（(勝：+1, 負：-1) ±空欄数）
+	int		min_level(int alpha, int beta, int n_empty);	//	黒から見た評価値を返す（(勝：+1, 負：-1) ±空欄数）
+	int		max_level(int alpha, int beta, int n_empty);	//	黒から見た評価値を返す（(勝：+1, 負：-1) ±空欄数）
 public:
 	int		m_width;
 	int		m_ary_width;
 	int		m_ary_height;
 	int		m_ary_size;
 	uchar	m_seq_gid;
+	__int64		m_n_node;					//	末端ノード数
 	std::vector<uchar> m_cells;
 	std::vector<uchar> m_gid;
 	std::vector<uchar> m_gid_stack;
+	std::vector<int> m_put_stack;		//	着手箇所
+	std::vector<int> m_seq_stack;		//	for m_seq_gid
 };
 

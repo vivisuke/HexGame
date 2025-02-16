@@ -98,5 +98,15 @@
 0096 ◎ C 02/11 02/11 0.001│ToDo│Board::sel_move_random() : int
 0097 ● C 02/12            │ToDo│MCTS (UCB) 実装
 0098 ◎ C 02/15 02/15 0.001│ToDo│Undo 可能 put() 実装
-0099 ● C 02/15            │ToDo│
-0100 ● C 02/15            │ToDo│
+0099 ◎ C 02/15 02/17 0.001│ToDo│min_max() 実装
+0100 ◎ C 02/16 02/17 0.001│ToDo│min_level(), max_level() に分ける
+0101 ◎ C 02/16 02/17 0.001│ToDo│alpha_beta 探索関数
+0102 ◎ C 02/16 02/17 0.001│ToDo│Undo：seq_id を復帰
+0103 ● C 02/17            │ToDo│
+0104 ● C 02/17            │ToDo│
+0105 ● C 02/17            │ToDo│
+0106 ● C 02/17            │ToDo│
+0107 ● C 02/17            │ToDo│
+0108 ● C 02/17            │ToDo│
+0109 ● C 02/17            │ToDo│
+0110 ● C 02/17            │ToDo│
