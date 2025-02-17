@@ -102,7 +102,7 @@
 0100 ◎ C 02/16 02/17 0.001│ToDo│min_level(), max_level() に分ける
 0101 ◎ C 02/16 02/17 0.001│ToDo│alpha_beta 探索関数
 0102 ◎ C 02/16 02/17 0.001│ToDo│Undo：seq_id を復帰
-0103 ● C 02/17            │ToDo│
+0103 ◎ C 02/17 02/18 0.001│ToDo│Board::n_empty()
 0104 ● C 02/17            │ToDo│
 0105 ● C 02/17            │ToDo│
 0106 ● C 02/17            │ToDo│
