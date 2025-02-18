@@ -67,7 +67,7 @@ void MCTS::do_search(int itr) {
 Board::Board(int wd)
 	: m_width(wd)
 {
-	m_ary_width = m_width + 2;
+	m_ary_width = m_width + 1;
 	m_ary_height = m_width + 2;
 	m_ary_size = m_ary_width * m_ary_height;
 	m_cells.resize(m_ary_size);
@@ -253,11 +253,24 @@ uchar Board::rollout(int ix, uchar col) {
 		if( put(ix, col) ) return col;
 	}
 }
+int Board::alpha_beta(uchar next) {
+	if( next == BLACK )
+		return max_level(-INT_MAX, INT_MAX, n_empty());
+	else
+		return min_level(-INT_MAX, INT_MAX, n_empty());
+}
+#define	toIX(x,y)	((y+1)*5+x)
+int moveOrderTable4x4[] = {toIX(2,1), toIX(1,2), toIX(3,0), toIX(0,3), 
+							toIX(1,1), toIX(2,2), toIX(2,0), toIX(0,2), toIX(3,1), toIX(1,3),
+							toIX(1,0), toIX(0,1), toIX(3,2), toIX(2,3), toIX(0,0), toIX(3,3), };
+
 int Board::min_level(int alpha, int beta, int n_empty) {
 	--n_empty;
 	int ix = xyToIndex(0, 0);
 	int ix9 = xyToIndex(m_width-1, m_width-1);
-	for(; ix <= ix9; ++ix) {
+	//for(; ix <= ix9; ++ix)
+	for(auto ix : moveOrderTable4x4)
+	{
 		if( m_cells[ix] == EMPTY ) {
 			if( saveStatePut(ix, WHITE) ) {	//	put() ¨ I‹Ç‚Ìê‡
 				++m_n_node;
@@ -276,7 +289,9 @@ int Board::max_level(int alpha, int beta, int n_empty) {
 	--n_empty;
 	int ix = xyToIndex(0, 0);
 	int ix9 = xyToIndex(m_width-1, m_width-1);
-	for(; ix <= ix9; ++ix) {
+	//for(; ix <= ix9; ++ix)
+	for(auto ix : moveOrderTable4x4)
+	{
 		if( m_cells[ix] == EMPTY ) {
 			if( saveStatePut(ix, BLACK) ) {	//	put() ¨ I‹Ç‚Ìê‡
 				++m_n_node;

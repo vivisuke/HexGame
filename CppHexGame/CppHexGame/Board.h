@@ -79,6 +79,7 @@ public:
 	int		max_level(int n_empty);				//	黒から見た評価値を返す（(勝：+1, 負：-1) ±空欄数）
 	int		min_level(int alpha, int beta, int n_empty);	//	黒から見た評価値を返す（(勝：+1, 負：-1) ±空欄数）
 	int		max_level(int alpha, int beta, int n_empty);	//	黒から見た評価値を返す（(勝：+1, 負：-1) ±空欄数）
+	int		alpha_beta(uchar);
 public:
 	int		m_width;
 	int		m_ary_width;

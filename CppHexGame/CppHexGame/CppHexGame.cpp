@@ -1,5 +1,6 @@
 ﻿#include <iostream>
 #include <assert.h>
+#include <chrono>
 #include "Board.h"
 
 using namespace std;
@@ -60,44 +61,14 @@ int main()
 	if( false ) {
 		Board bd(3);
 		bd.print();
-		uchar next = WHITE;
-		int n_empty = bd.n_empty() - 1;
-		for(int y = 0; y != bd.m_width; ++y) {
-			cout << string(y*2, ' ');
-			for(int x = 0; x != bd.m_width; ++x) {
-				auto ix = bd.xyToIndex(x, y);
-				if( bd.m_cells[ix] == EMPTY ) {
-					bd.saveStatePut(ix, BLACK);
-					int ev;
-					if( next == BLACK )
-						ev = bd.min_level(-INT_MAX, INT_MAX, n_empty);
-					else
-						ev = bd.max_level(-INT_MAX, INT_MAX, n_empty);
-					bd.undo(ix);
-				} else
-					printf("  NA");
-			}
-			printf("\n");
-		}
-		printf("\n");
-		cout << "n node = " << bd.m_n_node << endl << endl;
-	}
-	if( true ) {
-		Board bd(3);
-		bd.print();
 		uchar next = BLACK;
-		int n_empty = bd.m_width * bd.m_width - 1;
 		for(int y = 0; y != bd.m_width; ++y) {
 			cout << string(y*2, ' ');
 			for(int x = 0; x != bd.m_width; ++x) {
 				auto ix = bd.xyToIndex(x, y);
 				if( bd.m_cells[ix] == EMPTY ) {
 					bd.saveStatePut(ix, next);
-					int ev;
-					if( next == BLACK )
-						ev = bd.min_level(-INT_MAX, INT_MAX, n_empty);
-					else
-						ev = bd.max_level(-INT_MAX, INT_MAX, n_empty);
+					int ev = bd.alpha_beta(BLACK+WHITE-next);
 					printf("%4d", ev);
 					bd.undo(ix);
 				} else
@@ -108,23 +79,19 @@ int main()
 		printf("\n");
 		cout << "n node = " << bd.m_n_node << endl << endl;
 	}
+#if 0
 	if( true ) {
 		Board bd(3);
-		bd.saveStatePut(1, 1, BLACK);
+		bd.saveStatePut(2, 1, BLACK);
 		bd.print();
 		uchar next = WHITE;
-		int n_empty = bd.m_width * bd.m_width - 1;
 		for(int y = 0; y != bd.m_width; ++y) {
 			cout << string(y*2, ' ');
 			for(int x = 0; x != bd.m_width; ++x) {
 				auto ix = bd.xyToIndex(x, y);
 				if( bd.m_cells[ix] == EMPTY ) {
 					bd.saveStatePut(ix, next);
-					int ev;
-					if( next == BLACK )
-						ev = bd.min_level(-INT_MAX, INT_MAX, n_empty);
-					else
-						ev = bd.max_level(-INT_MAX, INT_MAX, n_empty);
+					int ev = bd.alpha_beta(BLACK+WHITE-next);
 					printf("%4d", ev);
 					bd.undo(ix);
 				} else
@@ -137,22 +104,89 @@ int main()
 	}
 	if( true ) {
 		Board bd(3);
-		bd.saveStatePut(1, 1, BLACK);
+		bd.saveStatePut(2, 1, BLACK);
 		bd.saveStatePut(2, 0, WHITE);
 		bd.print();
 		uchar next = BLACK;
-		int n_empty = bd.m_width * bd.m_width - 1;
 		for(int y = 0; y != bd.m_width; ++y) {
 			cout << string(y*2, ' ');
 			for(int x = 0; x != bd.m_width; ++x) {
 				auto ix = bd.xyToIndex(x, y);
 				if( bd.m_cells[ix] == EMPTY ) {
 					bd.saveStatePut(ix, next);
-					int ev;
-					if( next == BLACK )
-						ev = bd.min_level(-INT_MAX, INT_MAX, n_empty);
-					else
-						ev = bd.max_level(-INT_MAX, INT_MAX, n_empty);
+					int ev = bd.alpha_beta(BLACK+WHITE-next);
+					printf("%4d", ev);
+					bd.undo(ix);
+				} else
+					printf("  NA");
+			}
+			printf("\n");
+		}
+		("\n");
+		cout << "n node = " << bd.m_n_node << endl << endl;
+	}
+	if( true ) {
+		Board bd(3);
+		bd.saveStatePut(2, 1, BLACK);
+		bd.saveStatePut(2, 0, WHITE);
+		bd.saveStatePut(0, 1, BLACK);
+		bd.print();
+		uchar next = WHITE;
+		for(int y = 0; y != bd.m_width; ++y) {
+			cout << string(y*2, ' ');
+			for(int x = 0; x != bd.m_width; ++x) {
+				auto ix = bd.xyToIndex(x, y);
+				if( bd.m_cells[ix] == EMPTY ) {
+					bd.saveStatePut(ix, next);
+					int ev = bd.alpha_beta(BLACK+WHITE-next);
+					printf("%4d", ev);
+					bd.undo(ix);
+				} else
+					printf("  NA");
+			}
+			printf("\n");
+		}
+		("\n");
+		cout << "n node = " << bd.m_n_node << endl << endl;
+	}
+#endif
+	if( true ) {
+		Board bd(4);
+		bd.print();
+		auto start = chrono::high_resolution_clock::now(); // 計測開始
+		uchar next = BLACK;
+		for(int y = 0; y != bd.m_width; ++y) {
+			cout << string(y*2, ' ');
+			for(int x = 0; x != bd.m_width; ++x) {
+				auto ix = bd.xyToIndex(x, y);
+				if( bd.m_cells[ix] == EMPTY ) {
+					bd.saveStatePut(ix, next);
+					int ev = bd.alpha_beta(BLACK+WHITE-next);
+					printf("%4d", ev);
+					bd.undo(ix);
+				} else
+					cout << (bd.m_cells[ix] == BLACK ? "  ●" : "  ◯");
+			}
+			printf("\n");
+		}
+		printf("\n");
+		cout << "n node = " << bd.m_n_node << endl << endl;
+		auto end = chrono::high_resolution_clock::now();   // 計測終了
+		chrono::duration<double> elapsed_seconds = end - start; // 経過時間 (秒単位)
+		cout << "処理時間: " << elapsed_seconds.count() << " 秒" << endl << endl;
+	}
+	if( false ) {
+		Board bd(4);
+		bd.saveStatePut(1, 1, BLACK);
+		bd.print();
+		uchar next = WHITE;
+		for(int y = 0; y != bd.m_width; ++y) {
+			cout << string(y*2, ' ');
+			for(int x = 0; x != bd.m_width; ++x) {
+				auto ix = bd.xyToIndex(x, y);
+				if( bd.m_cells[ix] == EMPTY ) {
+					bd.saveStatePut(ix, next);
+					int ev = bd.alpha_beta(BLACK+WHITE-next);
 					printf("%4d", ev);
 					bd.undo(ix);
 				} else
@@ -163,26 +197,52 @@ int main()
 		printf("\n");
 		cout << "n node = " << bd.m_n_node << endl << endl;
 	}
-	if( false ) {
+	if( true ) {
 		Board bd(4);
-		int n_empty = bd.m_width * bd.m_width - 1;
+		bd.saveStatePut(1, 1, BLACK);
+		bd.saveStatePut(1, 2, WHITE);
+		bd.print();
+		uchar next = BLACK;
 		for(int y = 0; y != bd.m_width; ++y) {
+			cout << string(y*2, ' ');
 			for(int x = 0; x != bd.m_width; ++x) {
 				auto ix = bd.xyToIndex(x, y);
 				if( bd.m_cells[ix] == EMPTY ) {
-					bd.saveStatePut(ix, BLACK);
-					int ev = bd.min_level(-INT_MAX, INT_MAX, n_empty);
+					bd.saveStatePut(ix, next);
+					int ev = bd.alpha_beta(BLACK+WHITE-next);
 					printf("%4d", ev);
 					bd.undo(ix);
 				} else
-					printf("  NA");
+					cout << (bd.m_cells[ix] == BLACK ? "  ●" : "  ◯");
 			}
 			printf("\n");
 		}
 		printf("\n");
-		cout << "n node = " << bd.m_n_node << endl;
+		cout << "n node = " << bd.m_n_node << endl << endl;
+	}
+	if( true ) {
+		Board bd(4);
+		bd.saveStatePut(1, 1, BLACK);
+		bd.saveStatePut(1, 2, WHITE);
+		bd.saveStatePut(3, 1, BLACK);
 		bd.print();
-		bd.print_gid();
+		uchar next = WHITE;
+		for(int y = 0; y != bd.m_width; ++y) {
+			cout << string(y*2, ' ');
+			for(int x = 0; x != bd.m_width; ++x) {
+				auto ix = bd.xyToIndex(x, y);
+				if( bd.m_cells[ix] == EMPTY ) {
+					bd.saveStatePut(ix, next);
+					int ev = bd.alpha_beta(BLACK+WHITE-next);
+					printf("%4d", ev);
+					bd.undo(ix);
+				} else
+					cout << (bd.m_cells[ix] == BLACK ? "  ●" : "  ◯");
+			}
+			printf("\n");
+		}
+		printf("\n");
+		cout << "n node = " << bd.m_n_node << endl << endl;
 	}
 	if( false ) {
 		Board bd(4);
