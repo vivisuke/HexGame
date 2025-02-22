@@ -10,25 +10,30 @@ enum {
 	EMPTY = 0, BLACK, WHITE, BWALL, WWALL,
 };
 
+void calc_softmax(const std::vector<int>& evList, std::vector<double>&);
+
 struct MCTSNode {
-	int		m_ix;		//	着手箇所
+	short	m_ix;		//	着手箇所
 	uchar	m_col;		//	手番
 	int		m_wins;		//	勝数
+	int		m_sum_eval;	//	評価値合計
 	int		m_visits;	//	探索数
 	MCTSNode	*m_parent;					//	親ノード
 	std::vector<MCTSNode>	m_children;		//	子ノード
 public:
-	MCTSNode(int ix = -1, uchar col = EMPTY)
+	MCTSNode(short ix = -1, uchar col = EMPTY)	//	col: 次の手番
 		: m_ix(ix), m_col(col)
 		, m_parent(NULL)
 	{
 		m_wins = m_visits = 0;
+		m_sum_eval = 0;
 	}
 	~MCTSNode() {
 		//for(auto *ptr : m_children) free(ptr);
 	}
+	void print(int depth = 0) const;
 	double calculate_ucb(double = 2.0) const;
-	MCTSNode *select_child_ucb(double = 2.0);
+	MCTSNode *select_child_ucb(double = 1.4);		//	引数値が大きいほど、低評価ノード探索：高確率
 };
 class MCTS {
 public:
@@ -37,7 +42,9 @@ public:
 		//free(m_root);
 	}
 public:
+	void	print() const;
 	void	do_expand(MCTSNode*);
+	void	do_backpropagation(MCTSNode*, int);
 	void	do_search(int itr = 10000);
 public:
 	const Board* m_board;
@@ -73,7 +80,9 @@ public:
 	bool	find_horz(uchar id, int y);
 	bool	find_vert(uchar id, int x);
 	int		sel_move_random() const;
+	int		sel_move_MCTS_ev() const;			//	末端評価値によるモンテカルロ木探索
 	uchar	rollout(int ix, uchar col);
+	int		rollout(int ix, uchar col, int n_empty);		//	評価値を返す
 	int		min_max(uchar col, int n_empty);	//	黒から見た評価値を返す（(勝：+1, 負：-1) ±空欄数）
 	int		min_level(int n_empty);				//	黒から見た評価値を返す（(勝：+1, 負：-1) ±空欄数）
 	int		max_level(int n_empty);				//	黒から見た評価値を返す（(勝：+1, 負：-1) ±空欄数）

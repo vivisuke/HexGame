@@ -8,6 +8,22 @@ using namespace std;
 
 std::mt19937 rgen(std::random_device{}()); // シードを設定
 
+//vector<int> evList4x4 = {-9, -7, -7, +6,  -7, -7, +8, -5,  -5, +8, -7, -7,  +6, -7, -9};
+//vector<double> softmax_values;
+
+void calc_softmax(const vector<int>& evList, vector<double>& softmax_values) {
+	softmax_values.resize(evList.size());
+	int max_value = *std::max_element(evList.begin(), evList.end());
+	vector<double> exp_values(evList.size());
+	double sum_exp = 0.0;
+	for(int i = 0; i != evList.size(); ++i) {
+		sum_exp += exp_values[i] = exp(evList[i] - max_value);
+	}
+	for(int i = 0; i != evList.size(); ++i) {
+		softmax_values[i] = exp_values[i] / sum_exp;
+	}
+}
+
 //--------------------------------------------------------------------------------
 double MCTSNode::calculate_ucb(double c_puct) const {
 	//if( m_visits == 0 )
@@ -31,13 +47,41 @@ MCTSNode* MCTSNode::select_child_ucb(double c_puct) {
 	}
 	return best;
 }
+void MCTSNode::print(int depth) const {
+	cout << string(depth*2, ' ');
+	cout << "ix = " << m_ix << ", col = " << (int)m_col << ", ave(ev) = ";
+	if( m_visits != 0 ) {
+		cout << (double)m_sum_eval/m_visits;
+		cout << " (" << m_sum_eval << "/" << m_visits << ")" << endl;
+	} else {
+		cout << "N/A" << endl;
+	}
+	for(const auto& node : m_children)
+		node.print(depth+1);
+}
 //--------------------------------------------------------------------------------
-MCTS::MCTS(const Board* board, uchar col)
+MCTS::MCTS(const Board* board, uchar col)	//	col: 次の手番
 	: m_board(board), m_col(col)
 {
 	//m_root = new MCTSNode();
+	m_root.m_col = (BLACK + WHITE) - col;
 }
-void MCTS::do_expand(MCTSNode* node) {
+void MCTS::print() const {
+	m_root.print();
+#if 0
+	//auto node = &m_root;
+	for(const auto& node : m_root.m_children) {
+		cout << "ix = " << node.m_ix << ", ave(ev) = ";
+		if( node.m_visits != 0 ) {
+			cout << (double)node.m_sum_eval/node.m_visits;
+			cout << " (" << node.m_sum_eval << "/" << node.m_visits << ")" << endl;
+		} else {
+			cout << "N/A" << endl;
+		}
+	}
+#endif
+}
+void MCTS::do_expand(MCTSNode* node) {		//	node を展開
 	auto n = m_board->n_empty();
 	node->m_children.resize(n);
 	int i = 0;		//	子ノードインデックス
@@ -49,9 +93,18 @@ void MCTS::do_expand(MCTSNode* node) {
 			ch.m_ix = ix;
 			ch.m_col = col;
 			ch.m_wins = ch.m_visits = 0;
+			ch.m_sum_eval = 0;
 			ch.m_parent = node;
 			ch.m_children.clear();
 		}
+	}
+}
+void MCTS::do_backpropagation(MCTSNode* node, int ev) {
+	for(;;) {
+		node->m_visits += 1;
+		if( node == &m_root ) break;
+		node->m_sum_eval += ev;
+		node = node->m_parent;
 	}
 }
 void MCTS::do_search(int itr) {
@@ -59,8 +112,22 @@ void MCTS::do_search(int itr) {
 		Board bd(m_board->m_width);
 		bd.copy_from(*m_board);
 		auto *node = &m_root;
+		//	末端ノードへ移動
 		while( !node->m_children.empty() ) {
+			node = node->select_child_ucb();
+			bd.put(node->m_ix, node->m_col);
 		}
+		//	展開
+		if( node->m_visits != 0 || node == &m_root ) {
+			do_expand(node);
+			node = &node->m_children[rgen() % node->m_children.size()];
+		}
+		//	ロールアウト
+		auto ev = bd.rollout(node->m_ix, node->m_col, bd.n_empty());
+		//node->m_sum_eval += ev;
+		//node->m_visits += 1;
+		// 逆伝播
+		do_backpropagation(node, ev);
 	}
 }
 //--------------------------------------------------------------------------------
@@ -245,6 +312,12 @@ int Board::sel_move_random() const {
 	if( lst.empty() ) return 0;
 	return lst[rgen() % lst.size()];
 }
+int Board::sel_move_MCTS_ev() const {
+	MCTS mcts(this);
+	mcts.do_search(10);
+	mcts.print();
+	return 0;
+}
 uchar Board::rollout(int ix, uchar col) {
 	if( put(ix, col) ) return col;
 	for(;;) {
@@ -252,6 +325,21 @@ uchar Board::rollout(int ix, uchar col) {
 		ix = sel_move_random();
 		if( put(ix, col) ) return col;
 	}
+}
+//	黒から見た評価値を返す
+int Board::rollout(int ix, uchar col, int n_empty) {
+	if( !put(ix, col) ) {
+		for(;;) {
+			--n_empty;
+			col = (BLACK + WHITE) - col;
+			ix = sel_move_random();
+			if( put(ix, col) ) break;
+		}
+	}
+	if( col == BLACK )
+		return 1 + n_empty;
+	else
+		return -(1 + n_empty);
 }
 int Board::alpha_beta(uchar next) {
 	if( next == BLACK )
@@ -268,8 +356,8 @@ int Board::min_level(int alpha, int beta, int n_empty) {
 	--n_empty;
 	int ix = xyToIndex(0, 0);
 	int ix9 = xyToIndex(m_width-1, m_width-1);
-	//for(; ix <= ix9; ++ix)
-	for(auto ix : moveOrderTable4x4)
+	for(; ix <= ix9; ++ix)
+	//for(auto ix : moveOrderTable4x4)
 	{
 		if( m_cells[ix] == EMPTY ) {
 			if( saveStatePut(ix, WHITE) ) {	//	put() → 終局の場合
@@ -289,8 +377,8 @@ int Board::max_level(int alpha, int beta, int n_empty) {
 	--n_empty;
 	int ix = xyToIndex(0, 0);
 	int ix9 = xyToIndex(m_width-1, m_width-1);
-	//for(; ix <= ix9; ++ix)
-	for(auto ix : moveOrderTable4x4)
+	for(; ix <= ix9; ++ix)
+	//for(auto ix : moveOrderTable4x4)
 	{
 		if( m_cells[ix] == EMPTY ) {
 			if( saveStatePut(ix, BLACK) ) {	//	put() → 終局の場合

@@ -105,8 +105,18 @@
 0103 ◎ C 02/17 02/18 0.001│ToDo│Board::n_empty()
 0104 ◎ C 02/18 02/18 0.001│ToDo│Board::alpha_beta(col)
 0105 ◎ C 02/18 02/18 0.001│ToDo│4x4 中央あたりを優先 alpha-beta 探索
-0106 ● C 02/18            │ToDo│
-0107 ● C 02/18            │ToDo│
-0108 ● C 02/18            │ToDo│
-0109 ● C 02/18            │ToDo│
-0110 ● C 02/18            │ToDo│
+0106 ● C 02/18            │ToDo│探索優先テーブル：4x4 以外対応
+0107 ◎ C 02/19 02/19 0.001│ToDo│評価値を返す rollout()
+0108 ● C 02/19            │ToDo│完全読み評価値 → Softmax() 計算
+0109 ◎ C 02/22 02/22 0.001│ToDo│MCTSNode::print()
+0110 ◎ C 02/22 02/22 0.001│ToDo│do_backpropagation()
+0111 ● C 02/22            │ToDo│
+0112 ● C 02/22            │ToDo│
+0113 ● C 02/22            │ToDo│
+0114 ● C 02/22            │ToDo│
+0115 ● C 02/22            │ToDo│
+0116 ● C 02/22            │ToDo│
+0117 ● C 02/22            │ToDo│
+0118 ● C 02/22            │ToDo│
+0119 ● C 02/22            │ToDo│
+0120 ● C 02/22            │ToDo│
